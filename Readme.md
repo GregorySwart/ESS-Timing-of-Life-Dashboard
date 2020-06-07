@@ -9,3 +9,6 @@ Get rid of whitespace from the data counter "(n = #### )" -> "(n = ####)" (.noWS
 Find something worthwhile to put in navbar pages and main panel tabs or remove them.
 Find map drawer for R and possibly include spacial analysis.
 Sort out the split ballot issue
+
+You can view the current updated app at https://gregoryswart.shinyapps.io/ess-app/
+Data used is available at https://www.europeansocialsurvey.org/
