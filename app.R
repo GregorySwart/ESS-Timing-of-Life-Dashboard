@@ -1,3 +1,4 @@
+library(shinythemes)
 library(shiny)
 library(foreign)
 library(sets)
@@ -14,11 +15,14 @@ library(splitstackshape)
 tol <- as.data.frame(read.spss("data/tol.sav"))
 tol$year <- as.factor(tol$year)
 
-ui <- fluidPage(
-  titlePanel("Attitudes towards child-bearing age in European countries", windowTitle = "ESS Timing of Life"),
-  
+ui <- navbarPage("ESS Timing of Life",
+  #shinythemes::themeSelector(),
+  theme = shinythemes::shinytheme("sandstone"),
+  windowTitle = "ESS Timing of Life",
+  tabPanel("Navbar 1",
+           
   sidebarLayout(
-    sidebarPanel(
+    sidebarPanel(width = 3,
       img(src = "logo.png", height = "10%", width = "100%"),
       helpText("Create box plots showing attitues towards the minimum acceptable and ideal ages to become
                a parent, and the oldest aceptable age to have another child."),
@@ -49,36 +53,43 @@ ui <- fluidPage(
 #sliderInput("range", label = "Range of interest:", min = 0, max = 100, value = c(0, 100))
     ),
     
-    mainPanel(
+    mainPanel(width = 9,
       tabsetPanel(
           tabPanel("Tab1",
             plotOutput("plot"),
             br(),
-            p("You have selected",
-              strong(span(textOutput("selected_gen", inline = T), style = "color:red")),
-              "respondents from",
-              strong(span(textOutput("selected_cntry", inline = T), style = "color:red")),
-              "in",
-              strong(span(textOutput("selected_year", inline = T), style = "color:red")),
-              "between the ages of",
-              strong(span(textOutput("selected_age_min", inline = T), style = "color:red")),
-              "and",
-              strong(span(textOutput("selected_age_max", inline = T), style = "color:red")),
-              "(n =",
-              strong(span(textOutput("selected_n", inline = T), style = "color:red")),
-              ")."),
+            "You have selected",
+            strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
+            "respondents from",
+            strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")),
+            "in",
+            strong(span(textOutput("selected_year", inline = T), style = "color:darkred")),
+            "between the ages of",
+            strong(span(textOutput("selected_age_min", inline = T), style = "color:darkred")),
+            "and",
+            strong(span(textOutput("selected_age_max", inline = T), style = "color:darkred")),
+            "(n =",
+            
+            strong(span(textOutput("selected_n", inline = T), style = "color:darkred")), span(").", .noWS = "outside"),
       
             helpText("The collection for the 9th round of the European Social Survey is still ongoing, and as a 
-               result, data for some countries may be missing. For missing data an empty plot background will 
-               be displayed.")
+               result, data for some countries in 2018 may be missing. Data for some countries in 2006 is also 
+               missing. For missing data an empty plot background will be displayed.")
           ),
           tabPanel("tab 2",
-            p("This page is intentionally empty for now.")),
+            p("We are stil working on this page")
+          ),
           tabPanel("tab 3",
-            p("This page is intentionally empty for now."))
+            p("We are stil working on this page")
+          )
       )
     )
   )
+),
+tabPanel("Navbar2",
+         p("We are stil working on this page")),
+tabPanel("Navbar3",
+         p("We are stil working on this page"))
 )
 
 server <- function(input, output) {
