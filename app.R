@@ -25,7 +25,7 @@ ui <- navbarPage("ESS Timing of Life",
     sidebarPanel(width = 3,
       img(src = "logo.png", height = "10%", width = "100%"),
       helpText("Create box plots showing attitues towards the minimum acceptable and ideal ages to become
-               a parent, and the oldest aceptable age to have another child."),
+               a parent, and the oldest acceptable age to have another child."),
       selectInput("gender", 
                   label = "Select Gender",
                   choices = c("Female and Male", "Female","Male"),
@@ -77,19 +77,19 @@ ui <- navbarPage("ESS Timing of Life",
                missing. For missing data an empty plot background will be displayed.")
           ),
           tabPanel("tab 2",
-            p("We are stil working on this page")
+            p("We are still working on this page")
           ),
           tabPanel("tab 3",
-            p("We are stil working on this page")
+            p("We are still working on this page")
           )
       )
     )
   )
 ),
 tabPanel("Navbar2",
-         p("We are stil working on this page")),
+         p("We are still working on this page")),
 tabPanel("Navbar3",
-         p("We are stil working on this page"))
+         p("We are still working on this page"))
 )
 
 server <- function(input, output) {
