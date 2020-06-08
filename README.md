@@ -4,12 +4,13 @@ Visualising data for the 3rd and 9th waves of the European Social Survey (ESS) t
 
 The questionnaire was split evenly between asking about a woman becoming a mother and a man becoming a father. This distinction is not made in the app currently.
 
-Issues/tasks: \\
-Get rid of whitespace from the data counter "(n = #### )" -> "(n = ####)" (.noWS = ) does not seem to work for renderText() objects \\
-Find something worthwhile to put in navbar pages and main panel tabs or remove them. \\
-Find map drawer for R and possibly include spacial analysis. \\
-Sort out the split ballot issue. \\
-In case of a missing answer on any of the three questions, the respondent was discarded as missing data. Find a way to minimise data loss from this. \\
+Issues/tasks: \
+Get rid of whitespace from the data counter "(n = #### )" -> "(n = ####)" (.noWS = ) does not seem to work for renderText() objects \
+Find something worthwhile to put in navbar pages and main panel tabs or remove them. \
+Find map drawer for R and possibly include spacial analysis. \
+Sort out the split ballot issue. \
+In case of a missing answer on any of the three questions, the respondent was discarded as missing data. Find a way to minimise data loss from this. \
 
-You can view the current updated app at https://gregoryswart.shinyapps.io/ess-app/ \\
+
+You can view the current updated app at https://gregoryswart.shinyapps.io/ess-app/ \
 Data used is available at https://www.europeansocialsurvey.org/

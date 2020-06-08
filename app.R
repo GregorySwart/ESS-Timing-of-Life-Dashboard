@@ -19,11 +19,11 @@ ui <- navbarPage("ESS Timing of Life",
   #shinythemes::themeSelector(),
   theme = shinythemes::shinytheme("sandstone"),
   windowTitle = "ESS Timing of Life",
-  tabPanel("Navbar 1",
+  tabPanel("Main page",
            
   sidebarLayout(
     sidebarPanel(width = 3,
-      img(src = "logo.png", height = "10%", width = "100%"),
+      #img(src = "logo.png", height = "10%", width = "100%"),
       helpText("Create box plots showing attitues towards the minimum acceptable and ideal ages to become
                a parent, and the oldest acceptable age to have another child."),
       selectInput("gender", 
@@ -54,8 +54,21 @@ ui <- navbarPage("ESS Timing of Life",
     ),
     
     mainPanel(width = 9,
+          fluidRow(column(10,h2("Welcome to the ESS Timing of Life interactive dashboard!", align = "center")),column(2,img(src = "logo.png", height = "10%", width = "100%"))),
+          #h2("Welcome to the ESS Timing of Life interactive dashboard!"),
+          p("The European Social Survey (ESS) is an 
+            academically driven cross-national survey using high methodological standards to provide freely 
+            available data for 38 countries. You can subset the data by respondent demographics and data collection 
+            year in the panel on the left."),
       tabsetPanel(
-          tabPanel("Tab1",
+          
+          tabPanel("Child-bearing ages",
+            h4("Below you can see boxplots showing responses to the following three questions:"),
+            fluidRow(
+              column(4,strong("Before what age would you say a woman/man is generally too young to become a mother/father?")),
+              column(4,strong("In your opinion, what is the ideal age for a girl/boy or woman/man to become a mother/father?")),
+              column(4,strong("After what age would you say a woman/man is generally too old to consider having any more children?"))
+            ),
             plotOutput("plot"),
             br(),
             "You have selected",
@@ -86,9 +99,9 @@ ui <- navbarPage("ESS Timing of Life",
     )
   )
 ),
-tabPanel("Navbar2",
+tabPanel("Navbar 2",
          p("We are still working on this page")),
-tabPanel("Navbar3",
+tabPanel("Navbar 3",
          p("We are still working on this page"))
 )
 
@@ -201,9 +214,7 @@ server <- function(input, output) {
             axis.ticks.x=element_blank())+
       labs(x = "Too old to have more children")
     
-    grid.arrange(p1,p2,p3, nrow = 1#, 
-                 #top=textGrob("",gp=gpar(fontsize=20,font=1))
-                 )
+    grid.arrange(p1,p2,p3, nrow = 1)
     
   })
   
