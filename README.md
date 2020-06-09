@@ -9,7 +9,7 @@ Get rid of whitespace from the data counter "(n = #### )" -> "(n = ####)" (.noWS
 Find something worthwhile to put in navbar pages and main panel tabs or remove them. \
 Find map drawer for R and possibly include spacial analysis. \
 Sort out the split ballot issue. \
-In case of a missing answer on any of the three questions, the respondent was discarded as missing data. Find a way to minimise data loss from this. \
+In case of a missing answer on any of the three questions, the respondent was discarded as missing data. Find a way to minimise data loss from this. 
 
 
 You can view the current updated app at https://gregoryswart.shinyapps.io/ess-app/ \
