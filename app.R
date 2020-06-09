@@ -191,7 +191,7 @@ ui <-
             plotOutput("by_year", height = 600)
           ),
           
-          tabPanel("By gender asked about",
+          tabPanel("By gender asked about", 
             br(),
             p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
               featuring women for one group, and men for another. The following plots show the difference between the 
