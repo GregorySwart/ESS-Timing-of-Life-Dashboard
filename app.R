@@ -99,22 +99,31 @@ ui <-
             a("here", href = "https://www.iban.com/country-codes", inline = T, .noWS = "after"),". Some lesser 
             known country codes are:"),
             fluidRow(
-              column(7,
+              column(4,
                 tags$div(tags$ul(
-                  tags$li(strong("CH"),"for Switzerland (Confederacio Helvetica)")
+                  tags$li(strong("CH"),"for Switzerland")
                 )),
                 
                 tags$div(tags$ul(
-                  tags$li(strong("RS"),"for Serbia (Republika Srbija)")
+                  tags$li(strong("RS"),"for Serbia")
                 ))
               ),
-              column(5,
+              column(4,
                 tags$div(tags$ul(
                   tags$li(strong("UA"),"for Ukraine")
                 )),
                 
                 tags$div(tags$ul(
-                  tags$li(strong("EI"),"for Ireland (Eire)")
+                  tags$li(strong("EI"),"for Ireland")
+                ))
+              ),
+              column(4,
+                tags$div(tags$ul(
+                  tags$li(strong("DE"),"for Germany")
+                )),
+              
+                tags$div(tags$ul(
+                  tags$li(strong("EE"),"for Estonia")
                 ))
               )
             )
@@ -136,26 +145,27 @@ ui <-
         br(),
         fluidRow(
           column(2),
-          column(2,
+          column(3,
             selectInput("gender",
-            label = "Select Gender",
-            choices = c("Female and Male", "Female","Male"),
-            selected = "Female and Male"
-          ),
+              label = "Select Gender",
+              choices = c("Female and Male", "Female","Male"),
+              selected = "Female and Male"
+            ),
           ),
           column(2,
+            sliderInput("age",
+              label = "Select Age Group",
+              min = 0,
+              max = 100,
+              value = c(0, 100))
+          ),
+          column(3,
             selectInput("year",
               label = "Select Year",
               choices = c("2006 and 2018","2006","2018"),
               selected = "2006 and 2018"),
           ),
-          column(3,
-            sliderInput("age", "Select Age Group",
-            min = 0,
-            max = 100,
-            value = c(0, 100))
-          ),
-          column(6,
+          column(1,
                  
           )
         ),
@@ -165,7 +175,7 @@ ui <-
             p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
               the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
               see comparisons."),
-            plotOutput("overview", height = 600),
+            plotOutput("tygpnt_overview", height = 600),
           ),
           tabPanel("By gender (respondent)",
             br(),
@@ -176,19 +186,19 @@ ui <-
             strong(span("blue", style = "color:blue")),
             "counterparts. For this plot, 
               the gender selection tool above will not work (as both genders are represented)."),
-            plotOutput("by_gender", height = 600)
+            plotOutput("tygpnt_by_gender", height = 600)
           ),
           tabPanel("By year",
             br(),
             p("The plots below show the difference between the responses from 2006 and 2018, by country. 
               Responses from 2006 are depicted by",
-              strong(span("red", style = "color:red")),
+              strong(span("yellow", style = "color:gold")),
               "boxplots, and responses from 2018 by their",
-              strong(span("blue", style = "color:blue")),
+              strong(span("green", style = "color:green")),
               "counterparts. For this plot, the year selection tool above will not work (as data from both ESS vawes 
               are presented). Data for some countries is missing for both 2006 and 2018, in these cases a single 
               box plot will be displayed."),
-            plotOutput("by_year", height = 600)
+            plotOutput("tygpnt_by_year", height = 600)
           ),
           
           tabPanel("By gender asked about", 
@@ -202,7 +212,7 @@ ui <-
               strong(span("blue", style = "color:blue")),
               "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
               presented)."),
-            plotOutput("by_ballot", height = 600)
+            plotOutput("tygpnt_by_ballot", height = 600)
           )
         ),
         "You have selected",
@@ -279,7 +289,7 @@ server <- function(input, output) {
     )
   })
   
-  output$overview <- renderPlot({
+  output$tygpnt_overview <- renderPlot({
     
     if(input$year == "2006 and 2018"){
       chosen_year <- c("2006","2018")
@@ -327,7 +337,7 @@ server <- function(input, output) {
   
   })
   
-  output$by_gender <- renderPlot({
+  output$tygpnt_by_gender <- renderPlot({
     
     if(input$year == "2006 and 2018"){
       chosen_year <- c("2006","2018")
@@ -372,7 +382,7 @@ server <- function(input, output) {
     grid.arrange(ballot1,ballot2, nrow = 2)
   })
 
-  output$by_year <- renderPlot({
+  output$tygpnt_by_year <- renderPlot({
     
     if(input$year == "2006 and 2018"){
       chosen_year <- c("2006","2018")
@@ -382,7 +392,7 @@ server <- function(input, output) {
       chosen_gender <- c("Female", "Male")
     }else{chosen_gender <- c(input$gender)}
     
-    ballot1 <- ggplot(tol %>%
+    year1 <- ggplot(tol %>%
                         subset(ballot == 1) %>%
                         subset(gender != "No answer") %>%
                         subset(gender %in% chosen_gender) %>%
@@ -396,9 +406,10 @@ server <- function(input, output) {
             axis.ticks.x=element_blank(),
             legend.position = c(0.96,0.80)) +
       facet_wrap(~ cntry, nrow = 1) +
-      labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
+      labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')+
+      scale_fill_manual(values=c("gold", "forestgreen"))
     
-    ballot2 <- ggplot(tol %>%
+    year2 <- ggplot(tol %>%
                         subset(ballot == 2) %>%
                         subset(gender != "No answer") %>%
                         subset(gender %in% chosen_gender) %>%
@@ -412,12 +423,13 @@ server <- function(input, output) {
             axis.ticks.x=element_blank(),
             legend.position = "none") +
       facet_wrap(~ cntry, nrow = 1) +
-      labs(title = '"Before what age would you say a man is generally too young to become a father?"')
+      labs(title = '"Before what age would you say a man is generally too young to become a father?"')+
+      scale_fill_manual(values=c("gold", "forestgreen"))
     
-    grid.arrange(ballot1,ballot2, nrow = 2)
+    grid.arrange(year1,year2, nrow = 2)
   })
 
-  output$by_ballot <- renderPlot({
+  output$tygpnt_by_ballot <- renderPlot({
     
     if(input$year == "2006 and 2018"){
       chosen_year <- c("2006","2018")
