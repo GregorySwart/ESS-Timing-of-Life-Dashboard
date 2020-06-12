@@ -8,6 +8,10 @@ library(ggplot2)
 library(expss)
 library(grid)
 library(gridExtra)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rgeos)
 library(gdata)
 library(splitstackshape)} # Load in libraries
 
@@ -54,10 +58,12 @@ ui <- {navbarPage("ESS Timing of Life",
                     width= "100%", height = "100%")
               ),
               column(10,
-                p("In boxplots, the central horizontal line indicates the median, the central rectangle show 
+                p("In box plots, the central horizontal line indicates the median, the central rectangle shows 
               the interquartile range, and the dots at the top and bottom indicate any outliers that may be 
               present. In some questions, the ballot was split evenly (asking about women or men). This will be 
-              indicated where applicable. Data for some countries may be missing.", style = "text-align: justify")
+              indicated where applicable. Data for some countries may be missing. The plots below use very many 
+              data points, and many box plots need to be rendered, so the plots may take a few seconds to load.", 
+              style = "text-align: justify")
               )
               
             ),
@@ -103,8 +109,7 @@ ui <- {navbarPage("ESS Timing of Life",
         {fluidRow(
             br(),
             hr(),
-            h3("Demographics selector", 
-               align = "center"),
+            h3("Demographics selector", align = "center"),
             br(),
             column(3),
             column(6,
@@ -129,14 +134,14 @@ ui <- {navbarPage("ESS Timing of Life",
                             selected = "Female and Male"
                 ),
               selectInput("year",
-                          label = "Select Year",
+                          label = "Select data collection Year",
                           choices = c("2006 and 2018","2006","2018"),
                           selected = "2006 and 2018")
                 ),
                 column(3,
                   img(src = "agelogo.png", height = 90, width = 90),
                   img(src = "genderlogo.png", height = 90, width = 90),
-                  img(src = "calendarlogo.png", height = 90, width = 90),
+                  img(src = "calendarlogo1.png", height = 90, width = 90),
                   
                 ),
             )}
@@ -199,7 +204,7 @@ ui <- {navbarPage("ESS Timing of Life",
                     strong(span("yellow", style = "color:gold")),
                     "boxplots, and responses from 2018 by their",
                     strong(span("green", style = "color:green")),
-                    "counterparts. For this plot, the year selection tool above will not work (as data from both ESS vawes 
+                    "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
                     are presented). Data for some countries is missing for both 2006 and 2018, in these cases a single 
                     box plot will be displayed."),
                   plotOutput("tygpnt_by_year", height = 600)
@@ -216,7 +221,14 @@ ui <- {navbarPage("ESS Timing of Life",
                     "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
                     presented)."),
                   plotOutput("tygpnt_by_ballot", height = 600)
-                )}  # By ballot
+                )}, # By ballot
+                {tabPanel("By cohort",
+                  br(),
+                  p("The plots below show the difference between the responses of people born before 
+                    1960, between 1960 and 1990, and those born after 1990. The age selector tool will
+                    not work for these plots."),
+                  plotOutput("tygpnt_by_cohort", height = 600)
+                )}  # By cohort
               )} # TYGPNT Plotting tabs
           )}  # TYGPNT question
             )}, # TYGPNT tab
@@ -251,7 +263,7 @@ ui <- {navbarPage("ESS Timing of Life",
                     strong(span("yellow", style = "color:gold")),
                     "boxplots, and responses from 2018 by their",
                     strong(span("green", style = "color:green")),
-                    "counterparts. For this plot, the year selection tool above will not work (as data from both ESS vawes 
+                    "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
                     are presented). Data for some countries is missing for both 2006 and 2018, in these cases a single 
                     box plot will be displayed."),
                   plotOutput("iagpnt_by_year", height = 600)
@@ -268,12 +280,19 @@ ui <- {navbarPage("ESS Timing of Life",
                     "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
                     presented)."),
                   plotOutput("iagpnt_by_ballot", height = 600)
-                  )} # By ballot
+                  )}, # By ballot
+                  {tabPanel("By cohort",
+                            br(),
+                            p("The plots below show the difference between the responses of people born before 
+                    1960, between 1960 and 1990, and those born after 1990. The age selector tool will
+                    not work for these plots."),
+                            plotOutput("iagpnt_by_cohort", height = 600)
+                  )}  # By cohort
                 )} # IAGPNT plotting tabs
               )} # IAGPNT question
             )}, # IAGPNT tab
             {tabPanel("Age too old to have more children",
-                      {fluidRow(
+              {fluidRow(
                         h3("TOCHLD: After what age would you say a woman/man is generally too old to consider having any more children?", 
                            align = "center"),
                         br(),
@@ -303,7 +322,7 @@ ui <- {navbarPage("ESS Timing of Life",
                                       strong(span("yellow", style = "color:gold")),
                                       "boxplots, and responses from 2018 by their",
                                       strong(span("green", style = "color:green")),
-                                      "counterparts. For this plot, the year selection tool above will not work (as data from both ESS vawes 
+                                      "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
                     are presented). Data for some countries is missing for both 2006 and 2018, in these cases a single 
                     box plot will be displayed."),
                                     plotOutput("tochld_by_year", height = 600)
@@ -320,7 +339,14 @@ ui <- {navbarPage("ESS Timing of Life",
                                       "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
                     presented)."),
                                     plotOutput("tochld_by_ballot", height = 600)
-                          )}  # By ballot
+                          )},  # By ballot
+                          {tabPanel("By cohort",
+                                    br(),
+                                    p("The plots below show the difference between the responses of people born before 
+                    1960, between 1960 and 1990, and those born after 1990. The age selector tool will
+                    not work for these plots."),
+                                    plotOutput("tochld_by_cohort", height = 600)
+                          )}  # By cohort
                         )} # TOCHLD Plotting tabs
                       )}  # TOCHLD question
             )}  # TOCHLD tab
@@ -329,12 +355,10 @@ ui <- {navbarPage("ESS Timing of Life",
         )}, # Question selector menu
     )} # First page
   )}, # Main Page
-  {tabPanel("Navbar 1",
-         p("We are still working on this page")
-  )}, # 2nd Page
-  {tabPanel("Navbar 2",
-         p("We are still working on this page")
-  )}  # 3rd Page
+  {tabPanel("Map drawer",
+         p("In this page you will be able to view responses to survey questions using a map drawer."),
+         plotOutput("map")
+  )}  # Map drawer
 )}
 
 server <- function(input, output) {
@@ -541,7 +565,7 @@ server <- function(input, output) {
               legend.position = c(0.96,0.80)) +
         facet_wrap(~ cntry, nrow = 1) +
       labs(title='"Before what age would you say a ____ is generally too young to become a parent?" (WOMEN\'s responses)')+
-        scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
+      scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
       
       men <- ggplot(tol %>%
                           subset(gender == "Male") %>%
@@ -559,6 +583,50 @@ server <- function(input, output) {
         labs(title ='"Before what age would you say a ____ is generally too young to become a parent?" (MEN\'s responses)')
       
       grid.arrange(women,men, nrow = 2)
+    })
+    
+    output$tygpnt_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      cohort1 <- ggplot(tol %>%
+        subset(ballot == "1") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year),
+        mapping = aes(y = tygpnt, fill = cohort))+
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = c(0.96,0.80)) +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
+        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      
+      cohort2 <- ggplot(tol %>%
+        subset(ballot == "2") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year),
+        mapping = aes(y = tygpnt, fill = cohort))+
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      
+      grid.arrange(cohort1, cohort2, nrow = 2)
     })
   } # TYGPNT plots
   
@@ -746,6 +814,50 @@ server <- function(input, output) {
       
       grid.arrange(women,men, nrow = 2)
     })
+    
+    output$iagpnt_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      cohort1 <- ggplot(tol %>%
+                          subset(ballot == "1") %>%
+                          subset(gender %in% chosen_gender) %>%
+                          subset(year %in% chosen_year),
+                        mapping = aes(y = iagpnt, fill = cohort))+
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = c(0.96,0.80)) +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
+        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      
+      cohort2 <- ggplot(tol %>%
+                          subset(ballot == "2") %>%
+                          subset(gender %in% chosen_gender) %>%
+                          subset(year %in% chosen_year),
+                        mapping = aes(y = iagpnt, fill = cohort))+
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      
+      grid.arrange(cohort1, cohort2, nrow = 2)
+    })
   } # IAGPNT plots
 
   {
@@ -932,9 +1044,72 @@ server <- function(input, output) {
       
       grid.arrange(women,men, nrow = 2)
     })
+    
+    output$tochld_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      cohort1 <- ggplot(tol %>%
+                          subset(ballot == "1") %>%
+                          subset(gender %in% chosen_gender) %>%
+                          subset(year %in% chosen_year),
+                        mapping = aes(y = tochld, fill = cohort))+
+        scale_y_continuous(limits = c(20,60),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = c(0.96,0.80)) +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
+        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      
+      cohort2 <- ggplot(tol %>%
+                          subset(ballot == "2") %>%
+                          subset(gender %in% chosen_gender) %>%
+                          subset(year %in% chosen_year),
+                        mapping = aes(y = tochld, fill = cohort))+
+        scale_y_continuous(limits = c(20,60),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        geom_boxplot() +
+        facet_wrap(~cntry, nrow = 1)+
+        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      
+      grid.arrange(cohort1, cohort2, nrow = 2)
+    })
   } # TOCHLD plots
 
-
+  (output$map <- renderPlot({
+    
+    world <- ne_countries(scale = "medium", returnclass = "sf")
+    
+    ggplot(data = world) +
+      geom_sf() +
+      xlab("Longitude") + ylab("Latitude") +
+      ggtitle("World map") +
+      scale_x_continuous(limits = c(-20,50)) +
+      scale_y_continuous(limits = c(35,70)) +
+      theme(axis.text.y=element_blank(),
+            axis.title.y = element_blank(),
+            axis.ticks.y=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            axis.title.x = element_blank())
+    
+    })
+    
+  )
 }
 
 shinyApp(ui, server)
