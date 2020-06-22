@@ -37,7 +37,12 @@ colnames(agg)[1] <- "name"
 world1 <- merge(world1,agg, by = "name")
 world <- world1
 
-
+# world$tygpnt_f <-as.factor(world$tygpnt_f)
+# world$tygpnt_m <-as.factor(world$tygpnt_m)
+# world$iagpnt_f <-as.factor(world$iagpnt_f)
+# world$iagpnt_m <-as.factor(world$iagpnt_m)
+# world$tochld_f <-as.factor(world$iagpnt_f)
+# world$tochld_m <-as.factor(world$iagpnt_m)
 
 } # Data setup and functions
 
@@ -388,6 +393,14 @@ ui <- {navbarPage("ESS Timing of Life",
   )}, # Main Page
   {tabPanel("Map drawer",
          p("In this page you will be able to view responses to survey questions using a map drawer."),
+         selectInput("map_question",
+           label = "Select variable",
+           choices = c("Too young to become parent" = "tygpnt_",
+                       "Ideal age to become parent" = "iagpnt_",
+                       "Too old to have more children" = "tochld_")),
+         selectInput("map_ballot",
+           label = "Select gender asked about",
+           choices = c("Women" = "f","Men" = "m")),
          plotOutput("map")
   )}  # Map drawer
 )}
@@ -1193,15 +1206,14 @@ server <- function(input, output) {
       grid.arrange(cohort1, cohort2, nrow = 2)
     })
   } # TOCHLD plots
-
   output$map <- renderPlot({
     
-    #world <- ne_countries(scale = "medium", returnclass = "sf")
+    map_var <- paste(input$map_question, input$map_ballot, sep = "")
     
     ggplot(data = world) +
-      geom_sf(aes(fill = tygpnt_f)) +
+      geom_sf(aes(fill = world[[map_var]])) +
       xlab("Longitude") + ylab("Latitude") +
-      ggtitle("Map of europe") +
+      ggtitle("Title") +
       scale_x_continuous(limits = c(-20,50)) +
       scale_y_continuous(limits = c(35,70)) +
       theme(axis.text.y=element_blank(),
