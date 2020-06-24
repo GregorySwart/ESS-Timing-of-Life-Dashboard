@@ -13,6 +13,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(rgeos)
 library(gdata)
+library(shinyWidgets)
 library(splitstackshape)} # Load in libraries
 
 {
@@ -172,9 +173,10 @@ ui <- {navbarPage("ESS Timing of Life",
                   checkboxGroupInput("cntry",
                                      label = "Select Country",
                                      inline = T,
-                                     choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ","Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI","France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL","Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS","Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH","Ukraine" = "UA","UK" = "UK"),
+                                     choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ","Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI","France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL","Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS","Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH","Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
                                      selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "EI", "ES", "FI", "FR", "HU", "IT", "NL", "NO", "PL", "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK","EI","RS","selectall"))
-                    )
+                    ),
+                  actionButton("selectall", label="Select/Deselect all")
                   )
                 )
             )}
@@ -407,7 +409,7 @@ ui <- {navbarPage("ESS Timing of Life",
 
 
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   {
     output$selected_gen <- renderText({ 
@@ -1206,6 +1208,7 @@ server <- function(input, output) {
       grid.arrange(cohort1, cohort2, nrow = 2)
     })
   } # TOCHLD plots
+  
   output$map <- renderPlot({
     
     map_var <- paste(input$map_question, input$map_ballot, sep = "")
@@ -1225,9 +1228,48 @@ server <- function(input, output) {
     
     })
   
-  output$selected_cntry <- renderText(input$cntry)
+  output$selected_cntry <- renderText(input$cntry[1:(length(input$cntry)-1)])
   
+  observe({
+    if (input$selectall > 0) {
+      if (input$selectall %% 2 == 0){
+        updateCheckboxGroupInput(session=session, 
+                                 inputId="cntry",
+                                 inline = T,
+                                 choices = list(
+                                   "Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG",
+                                    "Cyprus" = "CY","Czechia" = "CZ","Germany" = "DE",
+                                    "Denmark" = "DK","Estonia" = "EE","Spain" = "ES",
+                                    "Finland" = "FI","France" = "FR","Hungary" = "HU",
+                                    "Ireland" = "EI","Italy" = "IT","Netherlands" = "NL",
+                                    "Norway" = "NO","Poland" = "PL","Portugal" = "PT",
+                                    "Russia" = "RU","Serbia" = "RS","Sweden" = "SE",
+                                    "Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
+                                    "Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
+                                 selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE",
+                                              "EI", "ES", "FI", "FR", "HU", "IT", "NL", "NO", "PL",
+                                              "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK", "EI",
+                                              "RS","selectall"))
+        
+      } else {
+        updateCheckboxGroupInput(session=session,
+                                 inline = T,
+                                 inputId="cntry",
+                                 choices = list(
+                                   "Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG",
+                                   "Cyprus" = "CY","Czechia" = "CZ","Germany" = "DE",
+                                   "Denmark" = "DK","Estonia" = "EE","Spain" = "ES",
+                                   "Finland" = "FI","France" = "FR","Hungary" = "HU",
+                                   "Ireland" = "EI","Italy" = "IT","Netherlands" = "NL",
+                                   "Norway" = "NO","Poland" = "PL","Portugal" = "PT",
+                                   "Russia" = "RU","Serbia" = "RS","Sweden" = "SE",
+                                   "Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
+                                   "Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
+                                 selected = c())
+      }}
+  })
 }
+
 
 shinyApp(ui, server)
 
