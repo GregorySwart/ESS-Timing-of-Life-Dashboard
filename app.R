@@ -14,6 +14,7 @@ library(rnaturalearthdata)
 library(rgeos)
 library(gdata)
 library(shinyWidgets)
+library(survey)
 library(splitstackshape)} # Load in libraries
 
 {
@@ -165,16 +166,23 @@ ui <- {navbarPage("ESS Timing of Life",
               selectInput("year",
                           label = "Select data collection Year",
                           choices = c("2006 and 2018","2006","2018"),
-                          selected = "2006 and 2018")
+                          selected = "2018")
                 ),
                 column(6,
                   fluidRow(
                   column(12,
-                  checkboxGroupInput("cntry",
-                                     label = "Select Country",
-                                     inline = T,
-                                     choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ","Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI","France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL","Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS","Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH","Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
-                                     selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "EI", "ES", "FI", "FR", "HU", "IT", "NL", "NO", "PL", "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK","EI","RS","selectall"))
+                  checkboxGroupInput(
+                    "cntry",
+                     label = "Select Country",
+                     inline = T,
+                     choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ",
+                                    "Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI",
+                                    "France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL",
+                                    "Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS",
+                                    "Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
+                                    "Ukraine" = "UA","UK" = "UK"),
+                     selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "EI", "ES", "FI", "FR", "HU",
+                                  "IT", "NL", "NO", "PL", "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK","EI","RS"))
                     ),
                   actionButton("selectall", label="Select/Deselect all")
                   )
@@ -459,20 +467,32 @@ server <- function(input, output, session) {
       if(input$year == "2006 and 2018"){
         chosen_year <- c("2006","2018")
       }else{chosen_year <- c(input$year)}
-  
+      
       if(input$gender == "Female and Male"){
         chosen_gender <- c("Female", "Male")
       }else{chosen_gender <- c(input$gender)}
       
       chosen_cntry <- input$cntry
       
-      p1 <- ggplot(tol %>%
-               subset(ballot == 1) %>%
-               subset(gender != "No answer") %>%
-               subset(gender %in% chosen_gender) %>%
-               subset(year %in% chosen_year) %>%
-               subset(cntry %in% chosen_cntry) %>%
-               subset(agea >= input$age[1] & agea <= input$age[2]),
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      data_agg <- count(data %>% subset(ballot == 1), cntry)
+      data_agg$median <- 0
+      
+      for (i in data_agg$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i), weights = subset(data, cntry == i)$dweight)
+        data_agg$median[which(data_agg$cntry == i)] <- svymean(subset(data, cntry == i)$tygpnt, design = design)[1] %>% round(digits = 2)
+      }
+      
+      length(subset(data, cntry == "HU")$tygpnt)
+      length(data$tygpnt[which(data$cntry == "HU")])
+      
+      p1 <- ggplot(data %>% subset(ballot == 1),
              mapping = aes(y = tygpnt))+
         geom_boxplot() +
         scale_y_continuous(limits = c(10,50),
@@ -484,13 +504,10 @@ server <- function(input, output, session) {
         facet_wrap(~ cntry, nrow = 1) +
         labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
       
-      p2 <- ggplot(tol %>%
-               subset(ballot == 2) %>%
-               subset(gender != "No answer") %>%
-               subset(gender %in% chosen_gender) %>%
-               subset(year %in% chosen_year) %>%
-               subset(cntry %in% chosen_cntry) %>%
-               subset(agea >= input$age[1] & agea <= input$age[2]),
+      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+      tbl1 <- tableGrob(t(data_agg), rows=c("Country","N","Mean"), theme=tt)
+      
+      p2 <- ggplot(data %>% subset(ballot == 2),
              mapping = aes(y = tygpnt))+
         geom_boxplot() +
         scale_y_continuous(limits = c(10,50),
@@ -502,7 +519,7 @@ server <- function(input, output, session) {
         facet_wrap(~ cntry, nrow = 1) +
         labs(title = '"Before what age would you say a man is generally too young to become a father?"')
       
-      grid.arrange(p1,p2,nrow = 2)
+      grid.arrange(p1,tbl1,p2,nrow = 3)
     
     })
     
@@ -518,12 +535,14 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      ballot1 <- ggplot(tol %>%
-                     subset(ballot == 1) %>%
-                     subset(gender != "No answer") %>%
-                     subset(year %in% chosen_year) %>%
-                     subset(cntry %in% chosen_cntry) %>%
-                     subset(agea >= input$age[1] & agea <= input$age[2]),
+      data <- tol %>%
+        subset(ballot == 1) %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      ballot1 <- ggplot(data,
                    mapping = aes(y = tygpnt, fill = gender))+
         geom_boxplot() +
         scale_y_continuous(limits = c(10,40),
@@ -1228,7 +1247,7 @@ server <- function(input, output, session) {
     
     })
   
-  output$selected_cntry <- renderText(input$cntry[1:(length(input$cntry)-1)])
+  output$selected_cntry <- renderText(sort(input$cntry))
   
   observe({
     if (input$selectall > 0) {
