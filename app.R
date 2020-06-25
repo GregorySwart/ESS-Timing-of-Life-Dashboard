@@ -484,11 +484,15 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2])
       
       data_agg <- count(data %>% subset(ballot == 1), cntry)
+      data_agg$mean <- 0
+      data_agg$se <- 0
       data_agg$median <- 0
       
       for (i in data_agg$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i), weights = subset(data, cntry == i)$dweight)
-        data_agg$median[which(data_agg$cntry == i)] <- svymean(subset(data, cntry == i)$tygpnt, design = design)[1] %>% round(digits = 2)
+        data_agg$mean[which(data_agg$cntry == i)] <- svymean(subset(data, cntry == i)$tygpnt, design = design)[1] %>% round(digits = 2)
+        data_agg$se[which(data_agg$cntry == i)] <- SE(svymean(subset(data, cntry == i)$tygpnt, design = design)) %>% round(digits = 5)
+        data_agg$median[which(data_agg$cntry == i)] <- median(subset(data, cntry == i)$tygpnt) %>% round(digits = 2)
       }
       
       length(subset(data, cntry == "HU")$tygpnt)
@@ -507,7 +511,7 @@ server <- function(input, output, session) {
         labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
       
       tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg), rows=c("Country","N","Mean"), theme=tt)
+      tbl1 <- tableGrob(t(data_agg), rows=c("Country","N","Weighted Mean", "Mean SE", "Median"), theme=tt)
       
       p2 <- ggplot(data %>% subset(ballot == 2),
              mapping = aes(y = tygpnt))+
