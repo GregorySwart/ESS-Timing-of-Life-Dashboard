@@ -86,7 +86,7 @@ ui <- {navbarPage("ESS Timing of Life",
             fluidRow(
               column(2,
                 img(src = "legend3.png",style="display: block; margin-left: auto; margin-right: auto;",
-                    width= "100%", height = "100%")
+                    width= "100%")
               ),
               column(10,
                 p("In box plots, the central horizontal line indicates the median, the central rectangle shows 
@@ -142,7 +142,9 @@ ui <- {navbarPage("ESS Timing of Life",
             hr(),
             h3("Demographics selector", align = "center"),
             br(),
-            column(3),
+            column(3,
+              img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
+              ),
             column(6,
                    p("In this section, you can subset the data that the plotting tabs below will take in to formulate box 
               plots. Please note that for certain comparitive plots, some of the selectors will",
@@ -189,12 +191,14 @@ ui <- {navbarPage("ESS Timing of Life",
                 )
             )}
             ),
-            column(3),
+            column(3,
+              img(src = "background_alt2.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
+            ),
             fluidRow(
               column(12,
-                br(),
+                hr(),
                 {fluidRow(
-                  p(align = "center",
+                  h4(align = "center",
                     "You have selected",
                     strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
                     "respondents",
@@ -212,7 +216,7 @@ ui <- {navbarPage("ESS Timing of Life",
                     span(").", .noWS = "outside")
                   )
                 )},  # Show selected N
-                hr(),
+                br(),
 #                textOutput("selected_cntry")
               )
             )
@@ -414,8 +418,6 @@ ui <- {navbarPage("ESS Timing of Life",
          plotOutput("map")
   )}  # Map drawer
 )}
-
-
 
 server <- function(input, output, session) {
   
@@ -1264,7 +1266,7 @@ server <- function(input, output, session) {
                                     "Norway" = "NO","Poland" = "PL","Portugal" = "PT",
                                     "Russia" = "RU","Serbia" = "RS","Sweden" = "SE",
                                     "Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
-                                    "Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
+                                    "Ukraine" = "UA","UK" = "UK"),
                                  selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE",
                                               "EI", "ES", "FI", "FR", "HU", "IT", "NL", "NO", "PL",
                                               "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK", "EI",
@@ -1283,12 +1285,11 @@ server <- function(input, output, session) {
                                    "Norway" = "NO","Poland" = "PL","Portugal" = "PT",
                                    "Russia" = "RU","Serbia" = "RS","Sweden" = "SE",
                                    "Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
-                                   "Ukraine" = "UA","UK" = "UK", "Select all" = "selectall"),
+                                   "Ukraine" = "UA","UK" = "UK"),
                                  selected = c())
       }}
   })
 }
-
 
 shinyApp(ui, server)
 
