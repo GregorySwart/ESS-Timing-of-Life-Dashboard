@@ -178,7 +178,7 @@ ui <- {navbarPage("ESS Timing of Life",
                                                                            "ES-ISCED IV, advanced vocational, sub-degree" = 5,
                                                                            "ES-ISCED V1, lower tertiary education, BA level" = 6,
                                                                            "ES-ISCED V2, higher tertiary education, >= MA level" = 7,
-                                                                           "Other/Missing data"),
+                                                                           "Other/Missing data" =0),
                                                             selected = c("ES-ISCED I , less than lower secondary" = 1,
                                                                          "ES-ISCED II, lower secondary" = 2,
                                                                          "ES-ISCED IIIb, lower tier upper secondary" = 3,
@@ -186,7 +186,7 @@ ui <- {navbarPage("ESS Timing of Life",
                                                                          "ES-ISCED IV, advanced vocational, sub-degree" = 5,
                                                                          "ES-ISCED V1, lower tertiary education, BA level" = 6,
                                                                          "ES-ISCED V2, higher tertiary education, >= MA level" = 7,
-                                                                         "Other/Missing data")),
+                                                                         "Other/Missing data" =0)),
                                                 actionButton("selectalledu", label = "Select/Deselect all")
                                          ),
                                          column(6,
@@ -495,23 +495,26 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
+      chosen_edu <- input$edu
+      
       data <- tol %>%
         subset(gender != "No answer") %>%
         subset(gender %in% chosen_gender) %>%
         subset(year %in% chosen_year) %>%
         subset(cntry %in% chosen_cntry) %>%
-        subset(agea >= input$age[1] & agea <= input$age[2])
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
       
-      data_agg <- count(data %>% subset(ballot == 1), cntry)
-      data_agg$mean <- 0
-      data_agg$se <- 0
-      data_agg$median <- 0
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
       
-      for (i in data_agg$cntry){
-        design <- svydesign(ids = ~0, data = subset(data, cntry == i), weights = subset(data, cntry == i)$dweight)
-        data_agg$mean[which(data_agg$cntry == i)] <- svymean(subset(data, cntry == i)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg$se[which(data_agg$cntry == i)] <- SE(svymean(subset(data, cntry == i)$tygpnt, design = design)) %>% round(digits = 5)
-        data_agg$median[which(data_agg$cntry == i)] <- median(subset(data, cntry == i)$tygpnt) %>% round(digits = 2)
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tygpnt) %>% round(digits = 2)
       }
       
       length(subset(data, cntry == "HU")$tygpnt)
@@ -530,7 +533,7 @@ server <- function(input, output, session) {
         labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
       
       tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg), rows=c("Country","N","Weighted Mean", "Mean SE", "Median"), theme=tt)
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","N","Weighted Mean", "Mean SE", "Median"), theme=tt)
       
       p2 <- ggplot(data %>% subset(ballot == 2),
                    mapping = aes(y = tygpnt))+
@@ -544,19 +547,19 @@ server <- function(input, output, session) {
         facet_wrap(~ cntry, nrow = 1) +
         labs(title = '"Before what age would you say a man is generally too young to become a father?"')
       
-      data_agg <- count(data %>% subset(ballot == 2), cntry)
-      data_agg$mean <- 0
-      data_agg$se <- 0
-      data_agg$median <- 0
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
       
-      for (i in data_agg$cntry){
-        design <- svydesign(ids = ~0, data = subset(data, cntry == i), weights = subset(data, cntry == i)$dweight)
-        data_agg$mean[which(data_agg$cntry == i)] <- svymean(subset(data, cntry == i)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg$se[which(data_agg$cntry == i)] <- SE(svymean(subset(data, cntry == i)$tygpnt, design = design)) %>% round(digits = 5)
-        data_agg$median[which(data_agg$cntry == i)] <- median(subset(data, cntry == i)$tygpnt) %>% round(digits = 2)
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tygpnt) %>% round(digits = 2)
       }
       
-      tbl2 <- tableGrob(t(data_agg), rows=c("Country","N","Weighted Mean", "Mean SE", "Median"), theme=tt)
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","N","Weighted Mean", "Mean SE", "Median"), theme=tt)
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
       
@@ -1340,7 +1343,7 @@ server <- function(input, output, session) {
                                                 "ES-ISCED IV, advanced vocational, sub-degree" = 5,
                                                 "ES-ISCED V1, lower tertiary education, BA level" = 6,
                                                 "ES-ISCED V2, higher tertiary education, >= MA level" = 7,
-                                                "Other/Missing data"),
+                                                "Other/Missing data"=0),
                                  selected = c("ES-ISCED I , less than lower secondary" = 1,
                                               "ES-ISCED II, lower secondary" = 2,
                                               "ES-ISCED IIIb, lower tier upper secondary" = 3,
@@ -1348,7 +1351,7 @@ server <- function(input, output, session) {
                                               "ES-ISCED IV, advanced vocational, sub-degree" = 5,
                                               "ES-ISCED V1, lower tertiary education, BA level" = 6,
                                               "ES-ISCED V2, higher tertiary education, >= MA level" = 7,
-                                              "Other/Missing data")
+                                              "Other/Missing data"=0)
                                  )
         
       } else {
@@ -1362,7 +1365,7 @@ server <- function(input, output, session) {
                                                 "ES-ISCED IV, advanced vocational, sub-degree" = 5,
                                                 "ES-ISCED V1, lower tertiary education, BA level" = 6,
                                                 "ES-ISCED V2, higher tertiary education, >= MA level" = 7,
-                                                "Other/Missing data"),
+                                                "Other/Missing data"=0),
                                  selected = c())
       }}
   })
