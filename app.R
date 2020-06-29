@@ -21,6 +21,8 @@
   `%notin%` = Negate(`%in%`)
   tol <- as.data.frame(read.spss("data/tol.sav"))
   agg <- as.data.frame(read.spss("data/agg.sav"))
+  agg_3 <- as.data.frame(read.spss("data/agg_3.sav"))
+  agg_9 <- as.data.frame(read.spss("data/agg_9.sav"))
   theme_set(theme_bw())
   
   world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -35,9 +37,22 @@
                         "Sweden"~"SE",    "Slovenia"~"SL",  "Slovakia"~"SK",   "Ukraine"~"UA",
                         "Czech Rep."~"CZ",   "Italy"~"IT",     "Serbia"~"RS", "Belarus" ~ "BY")
   world1 <- na.omit(world1)
-  colnames(agg)[1] <- "name"
-  world1 <- merge(world1,agg, by = "name")
-  world <- world1
+  #colnames(agg)[1] <- "name"
+  world_2006 <- merge(world1,agg_3, by = "name")
+  world_2006$tygpnt_f <- as.factor(world_2006$tygpnt_f)
+  world_2006$tygpnt_m <- as.factor(world_2006$tygpnt_m)
+  world_2006$iagpnt_f <- as.factor(world_2006$iagpnt_f)
+  world_2006$iagpnt_m <- as.factor(world_2006$iagpnt_m)
+  world_2006$tochld_f <- as.factor(world_2006$tochld_f)
+  world_2006$tochld_m <- as.factor(world_2006$tochld_m)
+  
+  world_2018 <- merge(world1,agg_9, by = "name")
+  world_2018$tygpnt_f <- as.factor(world_2018$tygpnt_f)
+  world_2018$tygpnt_m <- as.factor(world_2018$tygpnt_m)
+  world_2018$iagpnt_f <- as.factor(world_2018$iagpnt_f)
+  world_2018$iagpnt_m <- as.factor(world_2018$iagpnt_m)
+  world_2018$tochld_f <- as.factor(world_2018$tochld_f)
+  world_2018$tochld_m <- as.factor(world_2018$tochld_m)
   
   # world$tygpnt_f <-as.factor(world$tygpnt_f)
   # world$tygpnt_m <-as.factor(world$tygpnt_m)
@@ -1272,12 +1287,13 @@ server <- function(input, output, session) {
   
   output$map <- renderPlot({
     
-    map_var <- paste(input$map_question, input$map_ballot, sep = "")
+    map_var1 <- paste(input$map_question, input$map_ballot, sep = "")
+    map_var2 <- paste(input$map_question, input$map_ballot, sep = "")
     
-    ggplot(data = world) +
-      geom_sf(aes(fill = world[[map_var]])) +
+    m1 <- ggplot(data = world_2006) +
+      geom_sf(aes(fill = world_2006[[map_var1]])) +
       xlab("Longitude") + ylab("Latitude") +
-      ggtitle("Title") +
+      ggtitle("2006") +
       scale_x_continuous(limits = c(-20,50)) +
       scale_y_continuous(limits = c(35,70)) +
       theme(axis.text.y=element_blank(),
@@ -1285,7 +1301,24 @@ server <- function(input, output, session) {
             axis.ticks.y=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
-            axis.title.x = element_blank())
+            axis.title.x = element_blank()) +
+      scale_fill_hue(limits = c(18:50))
+    
+    m2 <-ggplot(data = world_2018) +
+      geom_sf(aes(fill = world_2018[[map_var2]])) +
+      xlab("Longitude") + ylab("Latitude") +
+      ggtitle("2018") +
+      scale_x_continuous(limits = c(-20,50)) +
+      scale_y_continuous(limits = c(35,70)) +
+      theme(axis.text.y=element_blank(),
+            axis.title.y = element_blank(),
+            axis.ticks.y=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            axis.title.x = element_blank())+
+      scale_fill_hue(limits = c(18:50))
+    
+    grid.arrange(m1, m2, ncol = 2)
     
   })
   
