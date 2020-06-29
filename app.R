@@ -35,7 +35,10 @@
                         "Hungary"~"HU",   "Ireland"~"EI",   "Netherlands" ~"NL",
                         "Norway"~"NO",    "Poland"~"PL",    "Portugal"~"PT",   "Russia" ~ "RU",
                         "Sweden"~"SE",    "Slovenia"~"SL",  "Slovakia"~"SK",   "Ukraine"~"UA",
-                        "Czech Rep."~"CZ",   "Italy"~"IT",     "Serbia"~"RS", "Belarus" ~ "BY")
+                        "Czech Rep."~"CZ",   "Italy"~"IT",     "Serbia"~"RS", "Belarus" ~ "BY",
+                        "Lithuania" ~ "LT", "Latvia" ~ "LV", "Iceland" ~ "IS", "Morocco" ~ "MA",
+                        "Liechtenstein" ~ "LI", "Luxembourg" ~ "LU", "Algeria" ~ "DZ",
+                        "Tunisia" ~ "TN", "Turkey" ~ "TR", "Georgia" ~ "GE", "Azerbaijan" ~ "AZ")
   world1 <- na.omit(world1)
   #colnames(agg)[1] <- "name"
   world_2006 <- merge(world1,agg_3, by = "name")
