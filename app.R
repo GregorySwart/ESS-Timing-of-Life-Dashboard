@@ -33,7 +33,7 @@
                         "Hungary"~"HU",   "Ireland"~"EI",   "Netherlands" ~"NL",
                         "Norway"~"NO",    "Poland"~"PL",    "Portugal"~"PT",   "Russia" ~ "RU",
                         "Sweden"~"SE",    "Slovenia"~"SL",  "Slovakia"~"SK",   "Ukraine"~"UA",
-                        "Czech Rep."~"CZ",   "Italy"~"IT",     "Serbia"~"RS")
+                        "Czech Rep."~"CZ",   "Italy"~"IT",     "Serbia"~"RS", "Belarus" ~ "BY")
   world1 <- na.omit(world1)
   colnames(agg)[1] <- "name"
   world1 <- merge(world1,agg, by = "name")
