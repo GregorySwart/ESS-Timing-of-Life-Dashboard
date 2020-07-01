@@ -67,103 +67,103 @@
 } # Data setup and functions
 
 ui <- {navbarPage("ESS Timing of Life",
-                  theme = shinythemes::shinytheme("sandstone"),
-                  windowTitle = "ESS Timing of Life",
-                  {tabPanel("Main page",
-                            {fluidPage(
-                              {fluidRow(
-                                column(2,
-                                       img(src = "logo.png", height = "10%", width = "100%")
-                                ),
-                                column(9,
-                                       h1("Welcome to the ESS Timing of Life interactive dashboard!", align = "center")
-                                ),
-                                column(1,
-                                       
-                                )
-                              )}, # Title
-                              {fluidRow(
-                                hr(),
-                                br(),
-                                column(3,
-                                       img(src = "background1.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
-                                ),
-                                column(6,
-                                       p("The European Social Survey (ESS) is an 
-            academically driven cross-national survey using high methodological standards to provide freely 
-            available data for 38 countries. All data used is available on the", 
-                                         a("ESS website", href = "https://www.europeansocialsurvey.org/", inline = T, .noWS = "after"),
-                                         ". The aim of this web app is to help understand data from the 'Timing of Life' module, using powerful, 
-            interactive visualisation. The Timing of life module was fielded in ESS3 (2006) and repeated in ESS9 
-            (2018). It aims to understand the views of European citizens on the organisation of the life course 
-            and of their strategies to influence and plan their own lives. It also includes measures on youngest 
-            age and oldest age of life events, planning for retirement and the timing of key life events.", 
-                                         style = "text-align: justify"),
-                                       h3("Box plots and country codes", align = "center"),
-                                       br(),
-                                       fluidRow(
-                                         column(2,
-                                                img(src = "legend3.png",style="display: block; margin-left: auto; margin-right: auto;",
-                                                    width= "100%")
-                                         ),
-                                         column(10,
-                                                p("In box plots, the central horizontal line indicates the median, the central rectangle shows 
-              the interquartile range, and the dots at the top and bottom indicate any outliers that may be 
-              present. In some questions, the ballot was split evenly (asking about women or men). This will be 
-              indicated where applicable. Data for some countries may be missing. The plots below use very many 
-              data points, and many box plots need to be rendered, so the plots may take a few seconds to load.", 
-                                                  style = "text-align: justify")
-                                         )
-                                         
-                                       ),
-                                       br(),
-                                       p("Countries are represented by their 2-letter country ISO code. A full list of ISO codes is available ",
-                                         a("here", href = "https://www.iban.com/country-codes", inline = T, .noWS = "after"),". Some lesser 
-            known country codes are:"),
-                                       fluidRow(
-                                         column(4,
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("CH"),"for Switzerland")
-                                                )),
-                                                
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("RS"),"for Serbia")
-                                                ))
-                                         ),
-                                         column(4,
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("UA"),"for Ukraine")
-                                                )),
-                                                
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("EI"),"for Ireland")
-                                                ))
-                                         ),
-                                         column(4,
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("DE"),"for Germany")
-                                                )),
-                                                
-                                                tags$div(tags$ul(
-                                                  tags$li(strong("EE"),"for Estonia")
-                                                ))
-                                         )
-                                       )
-                                       
-                                ),
-                                column(3,
-                                       img(src = "background2.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
-                                )
-                              )}, # Introduction
-                              {fluidRow(
-                                br(),
-                                hr(),
-                                h3("Demographics selector", align = "center"),
-                                br(),
-                                column(3,
-                                       img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
-                                ),
-                                column(6,
+  theme = shinythemes::shinytheme("sandstone"),
+  windowTitle = "ESS Timing of Life",
+  {tabPanel("Main page",
+            {fluidPage(
+              {fluidRow(
+                column(2,
+                       img(src = "logo.png", height = "10%", width = "100%")
+                ),
+                column(9,
+                       h1("Welcome to the ESS Timing of Life interactive dashboard!", align = "center")
+                ),
+                column(1,
+                       
+                )
+              )}, # Title
+              {fluidRow(
+                hr(),
+                br(),
+                column(3,
+                       img(src = "background1.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
+                ),
+                column(6,
+                       p("The European Social Survey (ESS) is an 
+academically driven cross-national survey using high methodological standards to provide freely 
+available data for 38 countries. All data used is available on the", 
+                         a("ESS website", href = "https://www.europeansocialsurvey.org/", inline = T, .noWS = "after"),
+                         ". The aim of this web app is to help understand data from the 'Timing of Life' module, using powerful, 
+interactive visualisation. The Timing of life module was fielded in ESS3 (2006) and repeated in ESS9 
+(2018). It aims to understand the views of European citizens on the organisation of the life course 
+and of their strategies to influence and plan their own lives. It also includes measures on youngest 
+age and oldest age of life events, planning for retirement and the timing of key life events.", 
+                         style = "text-align: justify"),
+                       h3("Box plots and country codes", align = "center"),
+                       br(),
+                       fluidRow(
+                         column(2,
+                                img(src = "legend3.png",style="display: block; margin-left: auto; margin-right: auto;",
+                                    width= "100%")
+                         ),
+                         column(10,
+                                p("In box plots, the central horizontal line indicates the median, the central rectangle shows 
+the interquartile range, and the dots at the top and bottom indicate any outliers that may be 
+present. In some questions, the ballot was split evenly (asking about women or men). This will be 
+indicated where applicable. Data for some countries may be missing. The plots below use very many 
+data points, and many box plots need to be rendered, so the plots may take a few seconds to load.", 
+                                  style = "text-align: justify")
+                         )
+                         
+                       ),
+                       br(),
+                       p("Countries are represented by their 2-letter country ISO code. A full list of ISO codes is available ",
+                         a("here", href = "https://www.iban.com/country-codes", inline = T, .noWS = "after"),". Some lesser 
+known country codes are:"),
+                       fluidRow(
+                         column(4,
+                                tags$div(tags$ul(
+                                  tags$li(strong("CH"),"for Switzerland")
+                                )),
+                                
+                                tags$div(tags$ul(
+                                  tags$li(strong("RS"),"for Serbia")
+                                ))
+                         ),
+                         column(4,
+                                tags$div(tags$ul(
+                                  tags$li(strong("UA"),"for Ukraine")
+                                )),
+                                
+                                tags$div(tags$ul(
+                                  tags$li(strong("EI"),"for Ireland")
+                                ))
+                         ),
+                         column(4,
+                                tags$div(tags$ul(
+                                  tags$li(strong("DE"),"for Germany")
+                                )),
+                                
+                                tags$div(tags$ul(
+                                  tags$li(strong("EE"),"for Estonia")
+                                ))
+                         )
+                       )
+                       
+                ),
+                column(3,
+                       img(src = "background2.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
+                )
+              )}, # Introduction
+              {fluidRow(
+                br(),
+                hr(),
+                h3("Demographics selector", align = "center"),
+                br(),
+                column(3,
+                       img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
+                ),
+                column(6,
                                        p("In this section, you can subset the data that the plotting tabs below will take in to formulate box 
               plots. Please note that for certain comparitive plots, some of the selectors will",
                                          strong("not"),
@@ -442,18 +442,21 @@ ui <- {navbarPage("ESS Timing of Life",
                               )}, # Question selector menu
                             )} # First page
                   )}, # Main Page
-                  {tabPanel("Map drawer",
-                            p("In this page you will be able to view responses to survey questions using a map drawer."),
-                            selectInput("map_question",
-                                        label = "Select variable",
-                                        choices = c("Too young to become parent" = "tygpnt_",
-                                                    "Ideal age to become parent" = "iagpnt_",
-                                                    "Too old to have more children" = "tochld_")),
-                            selectInput("map_ballot",
-                                        label = "Select gender asked about",
-                                        choices = c("Women" = "f","Men" = "m")),
-                            plotOutput("map")
-                  )}  # Map drawer
+  {tabPanel("Map drawer",
+    p("In this page you will be able to view responses to survey questions using a map drawer."),
+    selectInput("map_question",
+                label = "Select variable",
+                choices = c("Too young to become parent" = "tygpnt_",
+                            "Ideal age to become parent" = "iagpnt_",
+                            "Too old to have more children" = "tochld_")),
+    selectInput("map_ballot",
+                label = "Select gender asked about",
+                choices = c("Women" = "f","Men" = "m")),
+    plotOutput("map")
+                  )},  # Map drawer
+  {tabPanel("Data export",
+    p("You can download the data used in the app using the button below."),
+    downloadButton("downloadData", "Download"))}
 )}
 
 server <- function(input, output, session) {
@@ -1405,6 +1408,17 @@ server <- function(input, output, session) {
                                  selected = c())
       }}
   })
+  
+  data <- as.data.frame(read.spss("data/tol.sav"))
+  
+  output$downloadData <- downloadHandler(
+    
+    filename = function() { 
+      paste("dataset-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(data, file)
+    })
 }
 
 shinyApp(ui, server)
