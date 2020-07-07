@@ -462,16 +462,23 @@ ui <- {navbarPage("ESS Timing of Life",
                       )}, # Question selector menu
   )}, # Main Page
   {tabPanel("Map drawer",
-    h2("In this page you will be able to view responses to survey questions using a map drawer.", align = "center"),
+    h2("In this page you can view median responses to the survey questions using a map drawer.", align = "center"),
     hr(),
-    selectInput("map_question",
-                label = "Select variable",
-                choices = c("Too young to become parent" = "tygpnt_",
-                            "Ideal age to become parent" = "iagpnt_",
-                            "Too old to have more children" = "tochld_")),
-    selectInput("map_ballot",
-                label = "Select gender asked about",
-                choices = c("Women" = "f","Men" = "m")),
+    fluidRow(
+      column(3),
+      column(3, align = "left",
+         selectInput("map_question",
+           label = "Select variable",
+           choices = c("Too young to become parent" = "tygpnt_",
+                       "Ideal age to become parent" = "iagpnt_",
+                       "Too old to have more children" = "tochld_"))
+      ),
+      column(3, align = "left",
+        selectInput("map_ballot",
+          label = "Select gender asked about",
+          choices = c("Women" = "f","Men" = "m"))
+      )
+    ),
     plotOutput("map")
                   )}, # Map drawer
   {tabPanel("Data export",
@@ -480,7 +487,7 @@ ui <- {navbarPage("ESS Timing of Life",
     fluidRow(
       column(3, align = "center",
         fluidRow(
-          h4("Data used in main page")
+          h4("Data used in main page"),
         ),
         fluidRow(
           downloadButton("downloadcsv", "Download CSV", inline = T)
@@ -498,16 +505,22 @@ ui <- {navbarPage("ESS Timing of Life",
           collected during ESS3, and 2018 during ESS9. Cohort is a variable derived from yrbrn, where 1, 2 and 3
           denote those born after 1990, between 1960 and 1989, and before 1959, respectively. Ballot refers to 
           the question asked where the questions were split between asking about men or women. Here 1 
-          corrseponds to Women, and 2 to Men. Dweight and Pweight suvey weights, dweight was used to compute 
-          weighted means and standard errors. Finally, cntry refers to the respondent's home country, 
-          by its 2-letter country code.")
+          corrseponds to Women, and 2 to Men. Dweight and Pweight are the weights used in the survey. Dweight 
+          is the design weight and was used to compute weighted means and standard errors. Pweight stands for 
+          population size weight, this should be used when comparing countries to one another. A complete guide 
+          to ESS weights can be found", 
+          a("here.", href = "https://www.europeansocialsurvey.org/docs/methodology/ESS_weighting_data_1.pdf",
+          inline = T),
+          "And finally, cntry refers to the respondent's home country, 
+          by its 2-letter ISO code.")
       )
     ),
     hr(),
     fluidRow(
       column(3, align = "center",
              fluidRow(
-               h4("Data used in map drawer")
+               h4("Data used in map drawer"),
+               br()
              ),
              fluidRow(
                downloadButton("downloadmapcsv", "Download CSV", inline = T)
@@ -1481,7 +1494,15 @@ server <- function(input, output, session) {
     ggplot(data = world) +
       geom_sf(aes(fill = world[[map_var1]])) +
       xlab("Longitude") + ylab("Latitude") +
-      ggtitle("2006") +
+      ggtitle(paste('Median responses to the question',
+          recode(map_var1, 
+  "tygpnt_f"~'"Before what age would you say a woman is generally too young to become a mother?"',
+  "tygpnt_m"~'"Before what age would you say a man is generally too young to become a father?"',
+  "iagpnt_f"~'"In your opinion, what age is ideal for a woman to become a mother?"',
+  "iagpnt_m"~'"In your opinion, what age is ideal for a man to become a father?"',
+  "tochld_f"~'"After what age would you say a woman is generally too old to consider having any more children?"',
+  "tochld_m"~'"After what age would you say a man is generally too old to consider having any more children?"'),
+                    'in 2006 and 2018.')) +
       scale_x_continuous(limits = c(-20,50)) +
       scale_y_continuous(limits = c(35,70)) +
       theme(axis.text.y=element_blank(),
@@ -1490,7 +1511,18 @@ server <- function(input, output, session) {
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
             axis.title.x = element_blank())+
-      facet_wrap(~year)
+      facet_wrap(~year)+
+      labs(fill = "Age") +
+      scale_fill_continuous(limits = if(map_var1 == "tygpnt_f") {c(18,20)}
+                                else if(map_var1 == "tygpnt_m") {c(20,23)}
+                                else if(map_var1 == "iagpnt_f") {c(22,28)}
+                                else if(map_var1 == "iagpnt_m") {c(25,30)}
+                                else if(map_var1 == "tochld_f") {c(40,45)}
+                                else if(map_var1 == "tochld_m") {c(45,50)}
+                                else {NULL}
+                             ,
+                             high = "#132B43", low = "#56B1F7"
+                            )
     
     # m2 <-ggplot(data = world_2018) +
     #   geom_sf(aes(fill = world_2018[[map_var2]])) +
