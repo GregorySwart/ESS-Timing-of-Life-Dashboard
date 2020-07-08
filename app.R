@@ -19,7 +19,8 @@
   library(rsconnect)
   library(ggflags)
   library(ggthemes)
-  library(gridExtra)} # Load in libraries
+  library(gridExtra)
+  library(ggpubr)} # Load in libraries
 
 {
   `%notin%` = Negate(`%in%`)
@@ -82,9 +83,25 @@
   world_2018$year <- 2018
   world <- rbind(world_2006, world_2018)
   
+  world$year <- as.factor(world$year)
+  
+  world$name[which(world$name == "EI")] <- "IE"
+  world$name[which(world$name == "ES")] <- "EA"
+  world$name[which(world$name == "SL")] <- "SI"
+  world$name[which(world$name == "UK")] <- "GB"
+  
+  world$code <- tolower(world$name)
+  
+  
 } # Data setup and functions
 
 ui <- {navbarPage("ESS Timing of Life",
+  # setBackgroundColor(
+  #   color = c("#FFFFFF", "#FF9595"),
+  #   gradient = c("radial"),
+  #   direction = c("bottom"),
+  #   shinydashboard = FALSE
+  # ),
   theme = shinythemes::shinytheme("sandstone"),
   windowTitle = "ESS Timing of Life",
   {tabPanel("Main page",
@@ -479,8 +496,13 @@ ui <- {navbarPage("ESS Timing of Life",
           choices = c("Women" = "f","Men" = "m"))
       )
     ),
-    plotOutput("map")
-                  )}, # Map drawer
+    fluidRow(
+      column(2),
+      column(8,
+        plotOutput("map", height = 1200)
+        )
+      )
+    )}, # Map drawer
   {tabPanel("Data export",
     h2("In this page you can download the data used in the app in .csv and .sav formats", align = "center"),
     hr(),
@@ -640,7 +662,7 @@ server <- function(input, output, session) {
       
       p1 <- ggplot(data %>% subset(ballot == 1),
                    mapping = aes(y = tygpnt))+
-        geom_boxplot() +
+        geom_boxplot(fill = "red") +
         scale_y_continuous(limits = c(10,50),
                            breaks = seq(0,100,10)) +
         theme(axis.title.y = element_blank(),
@@ -1491,10 +1513,10 @@ server <- function(input, output, session) {
     map_var1 <- paste(input$map_question, input$map_ballot, sep = "")
     map_var2 <- paste(input$map_question, input$map_ballot, sep = "")
     
-    ggplot(data = world) +
+    map <- {ggplot(data = world) +
       geom_sf(aes(fill = world[[map_var1]])) +
       xlab("Longitude") + ylab("Latitude") +
-      ggtitle(paste('Median responses to the question',
+      ggtitle(paste('',
           recode(map_var1, 
   "tygpnt_f"~'"Before what age would you say a woman is generally too young to become a mother?"',
   "tygpnt_m"~'"Before what age would you say a man is generally too young to become a father?"',
@@ -1502,7 +1524,7 @@ server <- function(input, output, session) {
   "iagpnt_m"~'"In your opinion, what age is ideal for a man to become a father?"',
   "tochld_f"~'"After what age would you say a woman is generally too old to consider having any more children?"',
   "tochld_m"~'"After what age would you say a man is generally too old to consider having any more children?"'),
-                    'in 2006 and 2018.')) +
+                    '')) +
       scale_x_continuous(limits = c(-20,50)) +
       scale_y_continuous(limits = c(35,70)) +
       theme(axis.text.y=element_blank(),
@@ -1510,8 +1532,12 @@ server <- function(input, output, session) {
             axis.ticks.y=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
-            axis.title.x = element_blank())+
-      facet_wrap(~year)+
+            axis.title.x = element_blank(),
+            legend.position = c(0.04, 0.94))+
+      facet_wrap(~year, nrow = 2)+
+      scale_alpha_discrete(range = c(0.4,1)) +
+      scale_fill_brewer(palette = "Dark"
+                        , name = "year")+
       labs(fill = "Age") +
       scale_fill_continuous(limits = if(map_var1 == "tygpnt_f") {c(18,20)}
                                 else if(map_var1 == "tygpnt_m") {c(20,23)}
@@ -1519,10 +1545,31 @@ server <- function(input, output, session) {
                                 else if(map_var1 == "iagpnt_m") {c(25,30)}
                                 else if(map_var1 == "tochld_f") {c(40,45)}
                                 else if(map_var1 == "tochld_m") {c(45,50)}
-                                else {NULL}
-                             ,
-                             high = "#132B43", low = "#56B1F7"
-                            )
+                                else {NULL},
+                             high = "#132B43", low = "#56B1F7")}
+    legend1 <- ggplot(world %>% subset(year == 2006) %>% na.omit(), aes(y = reorder(name, tygpnt_f), x = tygpnt_f)) +
+      geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7")+
+      coord_cartesian(xlim=c(17,21))+
+      geom_flag(aes(country = code), size = 9)+
+      ggtitle("2006")+
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            axis.ticks.x = element_blank())
+    legend2 <- ggplot(world %>% subset(year == 2018) %>% na.omit(), aes(y = reorder(name, tygpnt_f), x = tygpnt_f)) +
+      geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7")+
+      coord_cartesian(xlim=c(17,21))+
+      geom_flag(aes(country = code), size = 9)+
+      ggtitle("2018")+
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank())
+    legend <- grid.arrange(legend1, legend2, nrow = 2)
+    
+    ggarrange(map, legend, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
+    
+    # ggplot(data = world) +
+    #   geom_col(aes(y = world[[map_var1]], fill = year), x = world$name)
+    
+    #grid.arrange(map, bar, ncol = 2)
     
     # m2 <-ggplot(data = world_2018) +
     #   geom_sf(aes(fill = world_2018[[map_var2]])) +
