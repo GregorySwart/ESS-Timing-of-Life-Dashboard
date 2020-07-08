@@ -5,6 +5,6 @@ account: gregoryswart
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2401452
-bundleId: 3363643
+bundleId: 3368211
 url: https://gregoryswart.shinyapps.io/ess-app/
-when: 1594145392.63896
+when: 1594228994.71253
