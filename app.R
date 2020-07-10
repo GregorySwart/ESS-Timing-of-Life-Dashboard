@@ -33,8 +33,9 @@
                                   "Sweden"~"SE",    "Slovenia"~"SL",  "Slovakia"~"SK",   "Ukraine"~"UA",
                                   "Czechia"~"CZ",   "Italy"~"IT",     "Serbia"~"RS"))
   tol_full$ballot <- drop.levels(
-    recode(tol_full$ballot, "Ask about girls, women"~1, "Ask about boys, men" ~ 2, "Group 1"~1, "Group 2" ~ 2))
+    recode(tol_full$ballot, "Ask about girls, women" ~ 1, "Ask about boys, men" ~ 2, "Group 1" ~ 1, "Group 2" ~ 2))
   tol <- as.data.frame(read.spss("data/tol.sav"))
+  tol <- na.omit(tol)
   agg <- as.data.frame(read.spss("data/agg.sav"))
   agg_3 <- as.data.frame(read.spss("data/agg_3.sav"))
   agg_9 <- as.data.frame(read.spss("data/agg_9.sav"))
@@ -91,6 +92,11 @@
   world$name[which(world$name == "UK")] <- "GB"
   
   world$code <- tolower(world$name)
+  
+  
+  code <- c("AT","BE","BG","CH","CY","DE","DK","EA","ES","FI","FR","GB","HU",
+            "IE","NL","NO","PL","PT","RU","SE","SI","SK","UA","CZ","IT","RS")
+  iso <- data.frame(code)
   
   
 } # Data setup and functions
@@ -786,7 +792,7 @@ server <- function(input, output, session) {
       
       tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
       
-      grid.arrange(ballot1, tbl1, ballot2, tbl2, nrow = 4)
+      grid.arrange(ballot1, ballot2, nrow = 2)
     })
     
     output$tygpnt_by_year <- renderPlot({
