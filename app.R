@@ -20,23 +20,13 @@
   library(ggflags)
   library(ggthemes)
   library(gridExtra)
-  library(ggpubr)} # Load in libraries
+  library(ggpubr)
+  library(gt)} # Load in libraries
 
 {
   `%notin%` = Negate(`%in%`)
-  tol_full <- as.data.frame(read.spss("data/tol_full.sav"))
-  tol_full$cntry <- drop.levels(recode(tol_full$cntry, "Austria" ~ "AT", "Belgium" ~ "BE", "Bulgaria" ~ "BG", "Switzerland"~ "CH",
-                                  "Cyprus" ~ "CY",  "Germany" ~ "DE", "Denmark"  ~ "DK", "Estonia"    ~ "EE",
-                                  "Spain" ~ "ES",   "Finland" ~ "FI", "France" ~"FR",    "United Kingdom" ~"UK",
-                                  "Hungary"~"HU",   "Ireland"~"EI",   "Netherlands" ~"NL",
-                                  "Norway"~"NO",    "Poland"~"PL",    "Portugal"~"PT",   "Russian Federation" ~ "RU",
-                                  "Sweden"~"SE",    "Slovenia"~"SL",  "Slovakia"~"SK",   "Ukraine"~"UA",
-                                  "Czechia"~"CZ",   "Italy"~"IT",     "Serbia"~"RS"))
-  tol_full$ballot <- drop.levels(
-    recode(tol_full$ballot, "Ask about girls, women" ~ 1, "Ask about boys, men" ~ 2, "Group 1" ~ 1, "Group 2" ~ 2))
   tol <- as.data.frame(read.spss("data/tol.sav"))
   tol <- na.omit(tol)
-  agg <- as.data.frame(read.spss("data/agg.sav"))
   agg_3 <- as.data.frame(read.spss("data/agg_3.sav"))
   agg_9 <- as.data.frame(read.spss("data/agg_9.sav"))
   theme_set(theme_bw())
@@ -56,29 +46,9 @@
                         "Liechtenstein" ~ "LI", "Luxembourg" ~ "LU", "Algeria" ~ "DZ",
                         "Tunisia" ~ "TN", "Turkey" ~ "TR", "Georgia" ~ "GE", "Azerbaijan" ~ "AZ")
   world1 <- na.omit(world1)
-  #colnames(agg)[1] <- "name"
+  
   world_2006 <- merge(world1, agg_3, by = "name")
-  # world_2006$tygpnt_f <- as.factor(world_2006$tygpnt_f)
-  # world_2006$tygpnt_m <- as.factor(world_2006$tygpnt_m)
-  # world_2006$iagpnt_f <- as.factor(world_2006$iagpnt_f)
-  # world_2006$iagpnt_m <- as.factor(world_2006$iagpnt_m)
-  # world_2006$tochld_f <- as.factor(world_2006$tochld_f)
-  # world_2006$tochld_m <- as.factor(world_2006$tochld_m)
-  
   world_2018 <- merge(world1, agg_9, by = "name")
-  # world_2018$tygpnt_f <- as.factor(world_2018$tygpnt_f)
-  # world_2018$tygpnt_m <- as.factor(world_2018$tygpnt_m)
-  # world_2018$iagpnt_f <- as.factor(world_2018$iagpnt_f)
-  # world_2018$iagpnt_m <- as.factor(world_2018$iagpnt_m)
-  # world_2018$tochld_f <- as.factor(world_2018$tochld_f)
-  # world_2018$tochld_m <- as.factor(world_2018$tochld_m)
-  
-  # world$tygpnt_f <-as.factor(world$tygpnt_f)
-  # world$tygpnt_m <-as.factor(world$tygpnt_m)
-  # world$iagpnt_f <-as.factor(world$iagpnt_f)
-  # world$iagpnt_m <-as.factor(world$iagpnt_m)
-  # world$tochld_f <-as.factor(world$iagpnt_f)
-  # world$tochld_m <-as.factor(world$iagpnt_m)
   
   world_2006$year <- 2006
   world_2018$year <- 2018
@@ -94,10 +64,18 @@
   world$code <- tolower(world$name)
   
   
-  code <- c("AT","BE","BG","CH","CY","DE","DK","EA","ES","FI","FR","GB","HU",
-            "IE","NL","NO","PL","PT","RU","SE","SI","SK","UA","CZ","IT","RS")
+  code <- sort(c("AT","BE","BG","CH","CY","DE","DK","EA","EE","FI","FR","GB","HU",
+                 "IE","NL","NO","PL","PT","RU","SE","SI","SK","UA","CZ","IT","RS"))
   iso <- data.frame(code)
-  
+  iso$country <- recode(code, "AT"~"Austria","BE"~"Belgium","BG"~"Bulgaria","CH"~"Switzerland","CY"~"Cyprus",
+                        "DE"~"Germany","DK"~"Denmark","EA"~"Spain","FI"~"Finland","FR"~"France",
+                        "GB"~"UnitedKingdom","HU"~"Hungary","IE"~"Ireland","NL"~"Netherlands","NO"~"Norway",
+                        "PL"~"Poland","PT"~"Portugal","RU"~"Russia","SE"~"Sweden","SI"~"Slovenia",
+                        "SK"~"Slovakia","UA"~"Ukraine","CZ"~"Czechia","IT"~"Italy","RS"~"Serbia",
+                        "EE"~"Estonia")
+  iso1 <- iso[1:9,]
+  iso2 <- iso[10:18,]
+  iso3 <- iso[19:26,]
   
 } # Data setup and functions
 
@@ -157,37 +135,16 @@ ui <- {navbarPage("ESS Timing of Life",
                
              ),
              br(),
-             p("Countries are represented by their 2-letter country ISO code. A full list of ISO codes is available ",
-               a("here", href = "https://www.iban.com/country-codes", inline = T, .noWS = "after"),". Some lesser 
-  known country codes are:"),
              fluidRow(
                column(4,
-                      tags$div(tags$ul(
-                        tags$li(strong("CH"),"for Switzerland")
-                      )),
-                      
-                      tags$div(tags$ul(
-                        tags$li(strong("RS"),"for Serbia")
-                      ))
-               ),
+                  gt(iso1)
+                ),
                column(4,
-                      tags$div(tags$ul(
-                        tags$li(strong("UA"),"for Ukraine")
-                      )),
-                      
-                      tags$div(tags$ul(
-                        tags$li(strong("EI"),"for Ireland")
-                      ))
-               ),
+                  gt(iso2)
+                ),
                column(4,
-                      tags$div(tags$ul(
-                        tags$li(strong("DE"),"for Germany")
-                      )),
-                      
-                      tags$div(tags$ul(
-                        tags$li(strong("EE"),"for Estonia")
-                      ))
-               )
+                  gt(iso3)
+                )
              )
              
       ),
@@ -1521,7 +1478,6 @@ server <- function(input, output, session) {
     
     map <- {ggplot(data = world) +
       geom_sf(aes(fill = world[[map_var1]])) +
-      xlab("Longitude") + ylab("Latitude") +
       ggtitle(paste('',
           recode(map_var1, 
   "tygpnt_f"~'"Before what age would you say a woman is generally too young to become a mother?"',
@@ -1551,13 +1507,13 @@ server <- function(input, output, session) {
                                 else if(map_var1 == "iagpnt_m") {c(25,30)}
                                 else if(map_var1 == "tochld_f") {c(40,45)}
                                 else if(map_var1 == "tochld_m") {c(45,50)}
-                                else {NULL},
+                                else {c(18,50)},
                              high = "#132B43", low = "#56B1F7")}
     
     legend1 <- {ggplot(world %>% subset(year == 2006) %>% na.omit()) +
       geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7", aes(y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]))+
       coord_cartesian(xlim=if(map_var1 == "tygpnt_f") {c(17,21)}
-                      else if(map_var1 == "tygpnt_m") {c(19,24)}
+                      else if(map_var1 == "tygpnt_m") {c(18,24)}
                       else if(map_var1 == "iagpnt_f") {c(21,29)}
                       else if(map_var1 == "iagpnt_m") {c(24,31)}
                       else if(map_var1 == "tochld_f") {c(39,46)}
@@ -1572,7 +1528,7 @@ server <- function(input, output, session) {
     legend2 <- ggplot(world %>% subset(year == 2018) %>% na.omit()) +
       geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7", aes(y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]))+
       coord_cartesian(xlim=if(map_var1 == "tygpnt_f") {c(17,21)}
-                      else if(map_var1 == "tygpnt_m") {c(19,24)}
+                      else if(map_var1 == "tygpnt_m") {c(18,24)}
                       else if(map_var1 == "iagpnt_f") {c(21,29)}
                       else if(map_var1 == "iagpnt_m") {c(24,31)}
                       else if(map_var1 == "tochld_f") {c(39,46)}
@@ -1585,26 +1541,6 @@ server <- function(input, output, session) {
     legend <- grid.arrange(legend1, legend2, nrow = 2)
     
     ggarrange(map, legend, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
-    
-    # ggplot(data = world) +
-    #   geom_col(aes(y = world[[map_var1]], fill = year), x = world$name)
-    
-    #grid.arrange(map, bar, ncol = 2)
-    
-    # m2 <-ggplot(data = world_2018) +
-    #   geom_sf(aes(fill = world_2018[[map_var2]])) +
-    #   xlab("Longitude") + ylab("Latitude") +
-    #   ggtitle("2018") +
-    #   scale_x_continuous(limits = c(-20,50)) +
-    #   scale_y_continuous(limits = c(35,70)) +
-    #   theme(axis.text.y=element_blank(),
-    #         axis.title.y = element_blank(),
-    #         axis.ticks.y=element_blank(),
-    #         axis.text.x=element_blank(),
-    #         axis.ticks.x=element_blank(),
-    #         axis.title.x = element_blank())
-    # 
-    # grid.arrange(m1, m2, ncol = 2)
     
   })
   } # Map drawer
@@ -1732,95 +1668,7 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 
-##### Old plot    #####
-# p1 <- ggplot(subset(tol, ballot == 1 & gender != "No answer"), mapping = aes(y = tygpnt, fill = gender))+
-#   geom_boxplot() +
-#   scale_y_continuous(limits = c(0,100),
-#                      breaks = seq(0,100,10)) +
-#   theme(axis.title.y = element_blank(),
-#         axis.text.x=element_blank(),
-#         axis.ticks.x=element_blank(),
-#         legend.position = "none") +
-#   facet_wrap(~ cntry, nrow = 1) +
-#   labs(title = "TYGPNT asked about women")
-# 
-# p2 <- ggplot(subset(tol, ballot == 2 & gender != "No answer"), mapping = aes(y = tygpnt, fill = gender))+
-#   geom_boxplot() +
-#   scale_y_continuous(limits = c(0,100),
-#                      breaks = seq(0,100,10)) +
-#   theme(axis.title.y = element_blank(),
-#         axis.text.x=element_blank(),
-#         axis.ticks.x=element_blank(),
-#         legend.position = "none") +
-#   facet_wrap(~ cntry, nrow = 1) +
-#   labs(title = "TYGPNT asked about men")
-# 
-# grid.arrange(p1,p2, nrow =2)
-
-
-
-##### Oldest plot #####
-# output$plot <- renderPlot({
-# 
-#   if(input$cntry == "All countries"){
-#     chosen_cntry <- c("Austria","Belgium","Bulgaria","Cyprus","Czechia","Denmark","Estonia","Finland",
-#                       "France","Germany","Hungary","Ireland","Italy","Latvia","Netherlands","Norway",
-#                       "Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia",
-#                       "Spain","Sweden","Switzerland","Ukraine","United Kingdom")
-#   }else{chosen_cntry <- c(input$cntry)}
-# 
-#   if(input$year == "2006 and 2018"){
-#     chosen_year <- c("2006","2018")
-#   }else{chosen_year <- c(input$year)}
-# 
-#   if(input$gender == "Female and Male"){
-#     chosen_gender <- c("Female", "Male")
-#   }else{chosen_gender <- c(input$gender)}
-# 
-#   p1 <- ggplot(tol %>%
-#                  subset(cntry %in% chosen_cntry) %>%
-#                  subset(gender %in% chosen_gender) %>%
-#                  subset(year %in% chosen_year) %>%
-#                  subset(agea >= input$age[1] & agea <= input$age[2]),
-#                mapping = aes(y = tygpnt))+
-#     geom_boxplot() +
-#     scale_y_continuous(limits = c(0,100),
-#                        breaks = seq(0,100,10)) +
-#     theme(axis.title.y = element_blank(),
-#           axis.text.x=element_blank(),
-#           axis.ticks.x=element_blank()) +
-#     labs(x = "Too young to become a parent")
-# 
-# 
-#   p2 <- ggplot(tol %>%
-#                  subset(cntry %in% chosen_cntry) %>%
-#                  subset(gender %in% chosen_gender) %>%
-#                  subset(year %in% chosen_year) %>%
-#                  subset(agea >= input$age[1] & agea <= input$age[2]),
-#                mapping = aes(y = iagpnt))+
-#     geom_boxplot() +
-#     scale_y_continuous(limits = c(0,100),
-#                        breaks = seq(0,100,10)) +
-#     theme(axis.title.y = element_blank(),
-#           axis.text.x=element_blank(),
-#           axis.ticks.x=element_blank())+
-#     labs(x = "Ideal age to become a parent")
-# 
-# 
-#   p3 <- ggplot(tol %>%
-#                  subset(cntry %in% chosen_cntry) %>%
-#                  subset(gender %in% chosen_gender) %>%
-#                  subset(year %in% chosen_year) %>%
-#                  subset(agea >= input$age[1] & agea <= input$age[2]),
-#                mapping = aes(y = tochld))+
-#     geom_boxplot() +
-#     scale_y_continuous(limits = c(0,100),
-#                        breaks = seq(0,100,10)) +
-#     theme(axis.title.y = element_blank(),
-#           axis.text.x=element_blank(),
-#           axis.ticks.x=element_blank())+
-#     labs(x = "Too old to have more children")
-# 
-#   grid.arrange(p1,p2,p3, nrow = 1)
-# 
-# })
+  # "Austria","Belgium","Bulgaria","Cyprus","Czechia","Denmark","Estonia","Finland",
+  # "France","Germany","Hungary","Ireland","Italy","Latvia","Netherlands","Norway",
+  # "Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia",
+  # "Spain","Sweden","Switzerland","Ukraine","United Kingdom"
