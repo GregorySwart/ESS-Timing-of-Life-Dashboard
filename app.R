@@ -69,7 +69,7 @@
   iso <- data.frame(code)
   iso$country <- recode(code, "AT"~"Austria","BE"~"Belgium","BG"~"Bulgaria","CH"~"Switzerland","CY"~"Cyprus",
                         "DE"~"Germany","DK"~"Denmark","EA"~"Spain","FI"~"Finland","FR"~"France",
-                        "GB"~"UnitedKingdom","HU"~"Hungary","IE"~"Ireland","NL"~"Netherlands","NO"~"Norway",
+                        "GB"~"United Kingdom","HU"~"Hungary","IE"~"Ireland","NL"~"Netherlands","NO"~"Norway",
                         "PL"~"Poland","PT"~"Portugal","RU"~"Russia","SE"~"Sweden","SI"~"Slovenia",
                         "SK"~"Slovakia","UA"~"Ukraine","CZ"~"Czechia","IT"~"Italy","RS"~"Serbia",
                         "EE"~"Estonia")
@@ -137,13 +137,13 @@ ui <- {navbarPage("ESS Timing of Life",
              br(),
              fluidRow(
                column(4,
-                  gt(iso1)
+                  gt(iso1) %>% tab_options(table.width = 180)
                 ),
                column(4,
-                  gt(iso2)
+                  gt(iso2) %>% tab_options( table.width = 180)
                 ),
                column(4,
-                  gt(iso3)
+                  gt(iso3) %>% tab_options( table.width = 180)
                 )
              )
              
@@ -574,7 +574,14 @@ server <- function(input, output, session) {
   } # Selected N text
   
   {
-  output$selected_cntry <- renderText(sort(input$cntry))
+  output$selected_cntry <- 
+      renderText(sort(input$cntry %>% recode("AT"~"Austria,", "BE" ~ "Belgium,","BG" ~ "Bulgaria,", "CY" ~ "Cyprus,",
+                                             "CZ"~"Czechia,", "DK" ~ "Denmark,", "EE"~"Estonia,", "FI"~"Finland,",
+                                             "FR"~"France,", "DE"~"Germany,", "HU"~"Hungary,", "IE"~"Ireland,",
+                                             "IT"~"Italy,", "NL"~"Netherlands,", "NO"~"Norway,", "PL"~"Poland,",
+                                             "PT"~"Portugal,","RO"~"Romania,","RU"~"Russia,","RS"~"Serbia,",
+                                             "SK"~"Slovakia,","SI"~"Slovenia,","ES"~"Spain,", "SE"~"Sweden,",
+                                             "CH"~"Switzerland,", "UA"~"Ukraine,","GB"~"United Kingdom,")))
   } # Selected country text
   
   {
