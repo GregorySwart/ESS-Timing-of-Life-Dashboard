@@ -26,6 +26,7 @@
 {
   `%notin%` = Negate(`%in%`)
   tol <- as.data.frame(read.spss("data/tol.sav"))
+  tol_full <- tol
   tol <- na.omit(tol)
   agg_3 <- as.data.frame(read.spss("data/agg_3.sav"))
   agg_9 <- as.data.frame(read.spss("data/agg_9.sav"))
@@ -95,9 +96,6 @@ ui <- {navbarPage("ESS Timing of Life",
       ),
       column(9,
              h1("Welcome to the ESS Timing of Life interactive dashboard!", align = "center")
-      ),
-      column(1,
-             
       )
     )}, # Title
     {fluidRow(
@@ -230,27 +228,30 @@ ui <- {navbarPage("ESS Timing of Life",
              img(src = "background_alt2.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
       ),
                       fluidRow(
-                        column(12,
+                        column(12, align= "center",
                                hr(),
                                {fluidRow(
-                                 h4(align = "center",
-                                    "You have selected",
-                                    strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
-                                    "respondents",
-                                    #                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")),
-                                    "in",
-                                    strong(span(textOutput("selected_year", inline = T), style = "color:darkred")),
-                                    "between the ages of",
-                                    strong(span(textOutput("selected_age_min", inline = T), style = "color:darkred")),
-                                    "and",
-                                    strong(span(textOutput("selected_age_max", inline = T), style = "color:darkred")),
-                                    "from the following countries:", tags$br(),
-                                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")), tags$br(),
-                                    "with highest achieved education being one of the following: ",
-                                    strong(span(textOutput("selected_edu", inline = T), style = "color:darkred")),
-                                    "(n =",
-                                    strong(span(textOutput("selected_n", inline = T), style = "color:darkred")),
-                                    span(").", .noWS = "outside")
+                                 column(1),
+                                 column(10,
+                                   h4(align = "center",
+                                      "You have selected",
+                                      strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
+                                      "respondents",
+                                      #                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")),
+                                      "in",
+                                      strong(span(textOutput("selected_year", inline = T), style = "color:darkred")),
+                                      "between the ages of",
+                                      strong(span(textOutput("selected_age_min", inline = T), style = "color:darkred")),
+                                      "and",
+                                      strong(span(textOutput("selected_age_max", inline = T), style = "color:darkred")),
+                                      "from the following countries:", tags$br(),
+                                      strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")), tags$br(),
+                                      "with highest achieved education being one of the following: ",
+                                      strong(span(textOutput("selected_edu", inline = T), style = "color:darkred")),
+                                      "(n =",
+                                      strong(span(textOutput("selected_n", inline = T), style = "color:darkred")),
+                                      span(").", .noWS = "outside")
+                                    )
                                  )
                                )},  # Show selected N
                                br(),
@@ -259,21 +260,21 @@ ui <- {navbarPage("ESS Timing of Life",
                       )
                     )}, # Demographics selector
     {navbarPage("Question of interest",
-                                  navbarMenu("Child-bearing ages",
-                                             {tabPanel("Age too young to become a parent",
-                                                       {fluidRow(
-                                                         h3("TYGPNT: Before what age would you say a woman/man is too young to become a mother/father?", 
-                                                            align = "center"),
-                                                         br(),
-                                                         {tabsetPanel(
-                                                           {tabPanel("Overview",
-                                                                     br(),
-                                                                     p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
+      navbarMenu("Child-bearing ages",
+        {tabPanel("Age too young to become a parent",
+         {fluidRow(
+           h3("TYGPNT: Before what age would you say a woman/man is too young to become a mother/father?", 
+              align = "center"),
+           br(),
+           {tabsetPanel(
+             {tabPanel("Overview",
+                       br(),
+                                       p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
             the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
             see comparisons."),
                                                                      plotOutput("tygpnt_overview", height = 600),
                                                            )}, # Overview
-                                                           {tabPanel("By gender (respondent)",
+             {tabPanel("By gender (respondent)",
                                                                      br(),
                                                                      p("The plots below show the difference between the responses of men and women, by country. Women's 
             responses are depicted by",
@@ -284,7 +285,7 @@ ui <- {navbarPage("ESS Timing of Life",
             the gender selection tool above will not work (as both genders are represented)."),
                                                                      plotOutput("tygpnt_by_gender", height = 600)
                                                            )}, # By gender
-                                                           {tabPanel("By year",
+             {tabPanel("By year",
                                                                      br(),
                                                                      p("The plots below show the difference between the responses from 2006 and 2018, by country. 
             Responses from 2006 are depicted by",
@@ -296,7 +297,7 @@ ui <- {navbarPage("ESS Timing of Life",
             from the plot: ", strong("Czechia, Denmark, Spain, Italy, Portugal, Serbia, Russia, Sweden, Slovakia, and Ukraine.")),
                                                                      plotOutput("tygpnt_by_year", height = 600)
                                                            )}, # By year
-                                                           {tabPanel("By gender asked about", 
+             {tabPanel("By gender asked about", 
                                                                      br(),
                                                                      p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
             featuring women for one group, and men for another. The following plots show the difference between the 
@@ -309,136 +310,174 @@ ui <- {navbarPage("ESS Timing of Life",
             presented)."),
                                                                      plotOutput("tygpnt_by_ballot", height = 600)
                                                            )}, # By ballot
-                                                           {tabPanel("By cohort",
+             {tabPanel("By cohort",
                                                                      br(),
                                                                      p("The plots below show the difference between the responses of people born before 
             1960, between 1960 and 1990, and those born after 1990. The age selector tool will
             not work for these plots."),
                                                                      plotOutput("tygpnt_by_cohort", height = 600)
                                                            )}  # By cohort
-                                                         )} # TYGPNT Plotting tabs
-                                                       )}  # TYGPNT question
-                                             )}, # TYGPNT tab
-                                             {tabPanel("Ideal age to become a parent",
-                                                       {fluidRow(
-                                                         h3("IAGPNT: In your opinion, what is the ideal age for a girl/boy or woman/man to become a mother/father?",
-                                                            align = "center"),
-                                                         br(),
-                                                         {tabsetPanel(
-                                                           {tabPanel("Overview",
-                                                                     br(),
-                                                                     p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
-            the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
-            see comparisons."),
-                                                                     plotOutput("iagpnt_overview", height = 600)
-                                                           )}, # Overview
-                                                           {tabPanel("By gender (respondent)",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses of men and women, by country. Women's 
-            responses are depicted by",
-                                                                       strong(span("red", style = "color:red")),
-                                                                       "boxplots, and men's are depicted by their",
-                                                                       strong(span("blue", style = "color:blue")),
-                                                                       "counterparts. For this plot, 
-            the gender selection tool above will not work (as both genders are represented)."),
-                                                                     plotOutput("iagpnt_by_gender", height = 600)
-                                                           )}, # By gender
-                                                           {tabPanel("By year",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses from 2006 and 2018, by country. 
-            Responses from 2006 are depicted by",
-                                                                       strong(span("yellow", style = "color:gold")),
-                                                                       "boxplots, and responses from 2018 by their",
-                                                                       strong(span("green", style = "color:green")),
-                                                                       "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
-            are presented). Data for the following countries is missing for either 2006 or 2018, and will be excluded 
-            from the plot: ", strong("Czechia, Denmark, Spain, Italy, Portugal, Serbia, Russia, Sweden, Slovakia, and Ukraine.")),
-                                                                     plotOutput("iagpnt_by_year", height = 600)
-                                                           )}, # By year
-                                                           {tabPanel("By gender asked about",
-                                                                     br(),
-                                                                     p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
-            featuring women for one group, and men for another. The following plots show the difference between the 
-            answers men and women gave to the question, depending on which gender was asked about. Responses to 
-            questions asked about women are shown using",
-                                                                       strong(span("red", style = "color:red")),
-                                                                       "boxplots, and responses to questions about men by their",
-                                                                       strong(span("blue", style = "color:blue")),
-                                                                       "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
-            presented)."),
-                                                                     plotOutput("iagpnt_by_ballot", height = 600)
-                                                           )}, # By ballot
-                                                           {tabPanel("By cohort",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses of people born before 
-            1960, between 1960 and 1990, and those born after 1990. The age selector tool will
-            not work for these plots."),
-                                                                     plotOutput("iagpnt_by_cohort", height = 600)
-                                                           )}  # By cohort
-                                                         )} # IAGPNT plotting tabs
-                                                       )} # IAGPNT question
-                                             )}, # IAGPNT tab
-                                             {tabPanel("Age too old to have more children",
-                                                       {fluidRow(
-                                                         h3("TOCHLD: After what age would you say a woman/man is generally too old to consider having any more children?", 
-                                                            align = "center"),
-                                                         br(),
-                                                         {tabsetPanel(
-                                                           {tabPanel("Overview",
-                                                                     br(),
-                                                                     p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
-            the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
-            see comparisons."),
-                                                                     plotOutput("tochld_overview", height = 600),
-                                                           )}, # Overview
-                                                           {tabPanel("By gender (respondent)",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses of men and women, by country. Women's 
-            responses are depicted by",
-                                                                       strong(span("red", style = "color:red")),
-                                                                       "boxplots, and men's are depicted by their",
-                                                                       strong(span("blue", style = "color:blue")),
-                                                                       "counterparts. For this plot, 
-            the gender selection tool above will not work (as both genders are represented)."),
-                                                                     plotOutput("tochld_by_gender", height = 600)
-                                                           )}, # By gender
-                                                           {tabPanel("By year",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses from 2006 and 2018, by country. 
-            Responses from 2006 are depicted by",
-                                                                       strong(span("yellow", style = "color:gold")),
-                                                                       "boxplots, and responses from 2018 by their",
-                                                                       strong(span("green", style = "color:green")),
-                                                                       "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
-            are presented). Data for the following countries is missing for either 2006 or 2018, and will be excluded 
-            from the plot: ", strong("Czechia, Denmark, Spain, Italy, Portugal, Serbia, Russia, Sweden, Slovakia, and Ukraine.")),
-                                                                     plotOutput("tochld_by_year", height = 600)
-                                                           )}, # By year
-                                                           {tabPanel("By gender asked about", 
-                                                                     br(),
-                                                                     p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
-            featuring women for one group, and men for another. The following plots show the difference between the 
-            answers men and women gave to the question, depending on which gender was asked about. Responses to 
-            questions asked about women are shown using",
-                                                                       strong(span("red", style = "color:red")),
-                                                                       "boxplots, and responses to questions about men by their",
-                                                                       strong(span("blue", style = "color:blue")),
-                                                                       "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
-            presented)."),
-                                                                     plotOutput("tochld_by_ballot", height = 600)
-                                                           )},  # By ballot
-                                                           {tabPanel("By cohort",
-                                                                     br(),
-                                                                     p("The plots below show the difference between the responses of people born before 
-            1960, between 1960 and 1990, and those born after 1990. The age selector tool will
-            not work for these plots."),
-                                                                     plotOutput("tochld_by_cohort", height = 600)
-                                                           )}  # By cohort
-                                                         )} # TOCHLD Plotting tabs
-                                                       )}  # TOCHLD question
-                                             )}  # TOCHLD tab
-                                  )
-                                  #          ,tabPanel("Collapse menu")
+           )} # TYGPNT Plotting tabs
+         )}  # TYGPNT question
+         )}, # TYGPNT tab
+        {tabPanel("Ideal age to become a parent",
+        {fluidRow(
+        h3("IAGPNT: In your opinion, what is the ideal age for a girl/boy or woman/man to become a mother/father?",
+        align = "center"),
+        br(),
+        {tabsetPanel(
+        {tabPanel("Overview",
+        br(),
+        p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
+        the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
+        see comparisons."),
+        plotOutput("iagpnt_overview", height = 600)
+        )}, # Overview
+        {tabPanel("By gender (respondent)",
+        br(),
+        p("The plots below show the difference between the responses of men and women, by country. Women's 
+        responses are depicted by",
+         strong(span("red", style = "color:red")),
+         "boxplots, and men's are depicted by their",
+         strong(span("blue", style = "color:blue")),
+         "counterparts. For this plot, 
+        the gender selection tool above will not work (as both genders are represented)."),
+        plotOutput("iagpnt_by_gender", height = 600)
+        )}, # By gender
+        {tabPanel("By year",
+        br(),
+        p("The plots below show the difference between the responses from 2006 and 2018, by country. 
+        Responses from 2006 are depicted by",
+         strong(span("yellow", style = "color:gold")),
+         "boxplots, and responses from 2018 by their",
+         strong(span("green", style = "color:green")),
+         "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
+        are presented). Data for the following countries is missing for either 2006 or 2018, and will be excluded 
+        from the plot: ", strong("Czechia, Denmark, Spain, Italy, Portugal, Serbia, Russia, Sweden, Slovakia, and Ukraine.")),
+        plotOutput("iagpnt_by_year", height = 600)
+        )}, # By year
+        {tabPanel("By gender asked about",
+        br(),
+        p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
+        featuring women for one group, and men for another. The following plots show the difference between the 
+        answers men and women gave to the question, depending on which gender was asked about. Responses to 
+        questions asked about women are shown using",
+         strong(span("red", style = "color:red")),
+         "boxplots, and responses to questions about men by their",
+         strong(span("blue", style = "color:blue")),
+         "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
+        presented)."),
+        plotOutput("iagpnt_by_ballot", height = 600)
+        )}, # By ballot
+        {tabPanel("By cohort",
+        br(),
+        p("The plots below show the difference between the responses of people born before 
+        1960, between 1960 and 1990, and those born after 1990. The age selector tool will
+        not work for these plots."),
+        plotOutput("iagpnt_by_cohort", height = 600)
+        )}  # By cohort
+        )} # IAGPNT plotting tabs
+        )} # IAGPNT question
+      )}, # IAGPNT tab
+        {tabPanel("Age too old to have more children",
+      {fluidRow(
+      h3("TOCHLD: After what age would you say a woman/man is generally too old to consider having any more children?", 
+      align = "center"),
+      br(),
+      {tabsetPanel(
+      {tabPanel("Overview",
+      br(),
+      p("In this tab you can subset the data as you like, using the buttons above. This serves as an overview of
+      the responses given to this question, to see the survey results as a whole. Use the tabs to the right to 
+      see comparisons."),
+      plotOutput("tochld_overview", height = 600),
+      )}, # Overview
+      {tabPanel("By gender (respondent)",
+      br(),
+      p("The plots below show the difference between the responses of men and women, by country. Women's 
+      responses are depicted by",
+       strong(span("red", style = "color:red")),
+       "boxplots, and men's are depicted by their",
+       strong(span("blue", style = "color:blue")),
+       "counterparts. For this plot, 
+      the gender selection tool above will not work (as both genders are represented)."),
+      plotOutput("tochld_by_gender", height = 600)
+      )}, # By gender
+      {tabPanel("By year",
+      br(),
+      p("The plots below show the difference between the responses from 2006 and 2018, by country. 
+      Responses from 2006 are depicted by",
+       strong(span("yellow", style = "color:gold")),
+       "boxplots, and responses from 2018 by their",
+       strong(span("green", style = "color:green")),
+       "counterparts. For this plot, the year selection tool above will not work (as data from both ESS waves 
+      are presented). Data for the following countries is missing for either 2006 or 2018, and will be excluded 
+      from the plot: ", strong("Czechia, Denmark, Spain, Italy, Portugal, Serbia, Russia, Sweden, Slovakia, and Ukraine.")),
+      plotOutput("tochld_by_year", height = 600)
+      )}, # By year
+      {tabPanel("By gender asked about", 
+      br(),
+      p("The respondents were split into two roughly equally numerous groups, and the question was posed to them 
+      featuring women for one group, and men for another. The following plots show the difference between the 
+      answers men and women gave to the question, depending on which gender was asked about. Responses to 
+      questions asked about women are shown using",
+       strong(span("red", style = "color:red")),
+       "boxplots, and responses to questions about men by their",
+       strong(span("blue", style = "color:blue")),
+       "counterparts. For this plot, the gender selection tool above will not work (as data for both are 
+      presented)."),
+      plotOutput("tochld_by_ballot", height = 600)
+      )},  # By ballot
+      {tabPanel("By cohort",
+      br(),
+      p("The plots below show the difference between the responses of people born before 
+      1960, between 1960 and 1990, and those born after 1990. The age selector tool will
+      not work for these plots."),
+      plotOutput("tochld_by_cohort", height = 600)
+      )}  # By cohort
+      )} # TOCHLD Plotting tabs
+      )}  # TOCHLD question
+      )}  # TOCHLD tab
+      ),
+      navbarMenu("Stages of life",
+        {tabPanel("Beginning of adulthood",
+          h3("AGEADLT: At what age, approximately, would you say girls/boys or women/men become adults?", 
+          align = "center"),
+          br(),
+          tabsetPanel(
+            tabPanel("Overview",
+               plotOutput("ageadlt_overview", height = 600)
+            )
+          )
+        )}, # AGEADLT tab
+        {tabPanel("Beginning of middle age",
+          h3("AGEMAGE: At what age, approximately, would you say girls/boys or women/men become middle aged?", 
+             align = "center"),
+          br(),
+          tabsetPanel(
+            tabPanel("Overview",
+              plotOutput("agemage_overview", height = 600)
+            )
+          )
+        )}, # AGEMAGE tab
+        {tabPanel("Beginning of old age",
+          h3("AGEOAGE: At what age, approximately, would you say women/men reach old age?", 
+             align = "center"),
+          br(),
+          tabsetPanel(
+            tabPanel("Overview",
+              plotOutput("ageoage_overview", height = 600)
+            )
+          )
+        )}  # AGEOAGE tab
+      ),
+      tabPanel("Hide plots",
+        br(),
+        br(),
+        br(),
+        br(),
+        br()
+      )
                       )}, # Question selector menu
   )}, # Main Page
   {tabPanel("Map drawer",
@@ -599,7 +638,7 @@ server <- function(input, output, session) {
       
       chosen_edu <- input$edu
       
-      data <- tol %>%
+      data_full <- tol_full %>%
         subset(gender != "No answer") %>%
         subset(gender %in% chosen_gender) %>%
         subset(year %in% chosen_year) %>%
@@ -607,18 +646,13 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      # data_full <- tol_full %>%
-      #   subset(gender != "No answer") %>%
-      #   subset(gender %in% chosen_gender) %>%
-      #   subset(year %in% chosen_year) %>%
-      #   subset(cntry %in% chosen_cntry) %>%
-      #   subset(agea >= input$age[1] & agea <= input$age[2]) %>%
-      #   subset(edu %in% chosen_edu)
+      data <- na.omit(data_full)
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
       data_agg1$se <- 0
       data_agg1$median <- 0
+      data_agg1$total_N <- 0
       
       col_order <- c("cntry", "mean", "se", "median","n")
       data_agg1 <- data_agg1[, col_order]
@@ -628,6 +662,7 @@ server <- function(input, output, session) {
         data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)[1] %>% round(digits = 2)
         data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)) %>% round(digits = 5)
         data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tygpnt) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
       }
       
       p1 <- ggplot(data %>% subset(ballot == 1),
@@ -643,7 +678,7 @@ server <- function(input, output, session) {
         labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
       
       tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       p2 <- ggplot(data %>% subset(ballot == 2),
                    mapping = aes(y = tygpnt))+
@@ -661,6 +696,7 @@ server <- function(input, output, session) {
       data_agg2$mean <- 0
       data_agg2$se <- 0
       data_agg2$median <- 0
+      data_agg2$total_N <- 0
       
       data_agg2 <- data_agg2[, col_order]
       
@@ -669,9 +705,10 @@ server <- function(input, output, session) {
         data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)[1] %>% round(digits = 2)
         data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)) %>% round(digits = 5)
         data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tygpnt) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
       
-      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
       
@@ -924,7 +961,7 @@ server <- function(input, output, session) {
       
       chosen_edu <- input$edu
       
-      data <- tol %>%
+      data_full <- tol_full %>%
         subset(gender != "No answer") %>%
         subset(gender %in% chosen_gender) %>%
         subset(year %in% chosen_year) %>%
@@ -932,10 +969,13 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
+      data <- na.omit(data_full)
+      
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
       data_agg1$se <- 0
       data_agg1$median <- 0
+      data_agg1$total_N <- 0
       
       col_order <- c("cntry", "mean", "se", "median","n")
       data_agg1 <- data_agg1[, col_order]
@@ -945,6 +985,7 @@ server <- function(input, output, session) {
         data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$iagpnt, design = design)[1] %>% round(digits = 2)
         data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$iagpnt, design = design)) %>% round(digits = 5)
         data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$iagpnt) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
       }
       
       p1 <- ggplot(data %>% subset(ballot == 1),
@@ -960,7 +1001,7 @@ server <- function(input, output, session) {
         labs(title = '"In your opinion, what age is ideal for a woman to become a mother?"')
       
       tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       p2 <- ggplot(data %>% subset(ballot == 2),
                    mapping = aes(y = iagpnt))+
@@ -978,6 +1019,7 @@ server <- function(input, output, session) {
       data_agg2$mean <- 0
       data_agg2$se <- 0
       data_agg2$median <- 0
+      data_agg2$total_N <- 0
       
       data_agg2 <- data_agg2[, col_order]
       
@@ -986,9 +1028,10 @@ server <- function(input, output, session) {
         data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$iagpnt, design = design)[1] %>% round(digits = 2)
         data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$iagpnt, design = design)) %>% round(digits = 5)
         data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$iagpnt) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg2$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
       
-      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
       
@@ -1208,7 +1251,7 @@ server <- function(input, output, session) {
       
       chosen_edu <- input$edu
       
-      data <- tol %>%
+      data_full <- tol_full %>%
         subset(gender != "No answer") %>%
         subset(gender %in% chosen_gender) %>%
         subset(year %in% chosen_year) %>%
@@ -1216,10 +1259,13 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
+      data <- na.omit(data_full)
+      
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
       data_agg1$se <- 0
       data_agg1$median <- 0
+      data_agg1$total_N <- 0
       
       col_order <- c("cntry", "mean", "se", "median","n")
       data_agg1 <- data_agg1[, col_order]
@@ -1229,6 +1275,7 @@ server <- function(input, output, session) {
         data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tochld, design = design)[1] %>% round(digits = 2)
         data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tochld, design = design)) %>% round(digits = 5)
         data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tochld) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
       }
       
       p1 <- ggplot(data %>% subset(ballot == 1),
@@ -1244,7 +1291,7 @@ server <- function(input, output, session) {
         labs(title = '"After what age would you say a woman is generally too old to consider having any more children?"')
       
       tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       p2 <- ggplot(data %>% subset(ballot == 2),
                    mapping = aes(y = tochld))+
@@ -1262,6 +1309,7 @@ server <- function(input, output, session) {
       data_agg2$mean <- 0
       data_agg2$se <- 0
       data_agg2$median <- 0
+      data_agg2$total_N <- 0
       
       data_agg2 <- data_agg2[, col_order]
       
@@ -1270,9 +1318,10 @@ server <- function(input, output, session) {
         data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tochld, design = design)[1] %>% round(digits = 2)
         data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tochld, design = design)) %>% round(digits = 5)
         data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tochld) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
       
-      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
       
@@ -1476,6 +1525,276 @@ server <- function(input, output, session) {
       grid.arrange(cohort1, cohort2, nrow = 2)
     })
   } # TOCHLD plots
+  
+  {
+    output$ageadlt_overview <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full)
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median","n")
+      data_agg1 <- data_agg1[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$ageadlt, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$ageadlt, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$ageadlt) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      p1 <- ggplot(data %>% subset(ballot == 1),
+                   mapping = aes(y = ageadlt))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"At what age, approximately, would you say girls or women become adults?"')
+      
+      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      p2 <- ggplot(data %>% subset(ballot == 2),
+                   mapping = aes(y = ageadlt))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(10,40),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"At what age, approximately, would you say boys or men become adults?"')
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$ageadlt, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$ageadlt, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$ageadlt) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+    })
+  } # AGEADLT plots
+  
+  {
+    output$agemage_overview <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full)
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median","n")
+      data_agg1 <- data_agg1[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$agemage, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$agemage, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$agemage) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      p1 <- ggplot(data %>% subset(ballot == 1),
+                   mapping = aes(y = agemage))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(20,60),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"At what age, approximately, would you say girls or women become middle aged?"')
+      
+      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      p2 <- ggplot(data %>% subset(ballot == 2),
+                   mapping = aes(y = agemage))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(20,60),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"AGEMAGE: At what age, approximately, would you say boys or men become middle aged?"')
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$agemage, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$agemage, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$agemage) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+    })
+  } # AGEMAGE plots
+  
+  {
+    output$ageoage_overview <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full)
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median","n")
+      data_agg1 <- data_agg1[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$ageoage, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$ageoage, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$ageoage) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      p1 <- ggplot(data %>% subset(ballot == 1),
+                   mapping = aes(y = ageoage))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(30,80),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"At what age, approximately, would you say women reach old age?"')
+      
+      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      p2 <- ggplot(data %>% subset(ballot == 2),
+                   mapping = aes(y = ageoage))+
+        geom_boxplot(fill = "#F37E7E") +
+        scale_y_continuous(limits = c(30,80),
+                           breaks = seq(0,100,10)) +
+        theme(axis.title.y = element_blank(),
+              axis.text.x=element_blank(),
+              axis.ticks.x=element_blank(),
+              legend.position = "none") +
+        facet_wrap(~ cntry, nrow = 1) +
+        labs(title = '"At what age, approximately, would you say men reach old age?"')
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$ageoage) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+      
+      grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+    })
+  } # AGEOAGE plots
   
   {
   output$map <- renderPlot({
