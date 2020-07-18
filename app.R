@@ -78,9 +78,9 @@
   iso2 <- iso[10:18,]
   iso3 <- iso[19:26,]
   
-} # Data setup and functions
+} # Data setup
 
-ui <- {navbarPage("ESS Timing of Life",
+ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
   # setBackgroundColor(
   #   color = c("#FFFFFF", "#FF9595"),
   #   gradient = c("radial"),
@@ -133,15 +133,23 @@ ui <- {navbarPage("ESS Timing of Life",
                
              ),
              br(),
-             fluidRow(
-               column(4,
-                  gt(iso1) %>% tab_options(table.width = 180)
+             tabsetPanel(
+               tabPanel("Show country codes",
+                 fluidRow(
+                   br(),
+                   column(4,
+                      gt(iso1) %>% tab_options(table.width = 180)
+                    ),
+                   column(4,
+                      gt(iso2) %>% tab_options( table.width = 180)
+                    ),
+                   column(4,
+                      gt(iso3) %>% tab_options( table.width = 180)
+                    )
+                  )
                 ),
-               column(4,
-                  gt(iso2) %>% tab_options( table.width = 180)
-                ),
-               column(4,
-                  gt(iso3) %>% tab_options( table.width = 180)
+                tabPanel(
+                  "Hide country codes"
                 )
              )
              
@@ -259,7 +267,7 @@ ui <- {navbarPage("ESS Timing of Life",
                         )
                       )
                     )}, # Demographics selector
-    {navbarPage("Question of interest",
+    {navbarPage("Question of interest", collapsable = TRUE,
       navbarMenu("Child-bearing ages",
         {tabPanel("Age too young to become a parent",
          {fluidRow(
@@ -446,7 +454,10 @@ ui <- {navbarPage("ESS Timing of Life",
           br(),
           tabsetPanel(
             tabPanel("Overview",
-               plotOutput("ageadlt_overview", height = 600)
+              plotOutput("ageadlt_overview", height = 600)
+            ),
+            tabPanel("By gender",
+              plotOutput("ageadlt_by_gender", height = 600)
             )
           )
         )}, # AGEADLT tab
@@ -457,7 +468,10 @@ ui <- {navbarPage("ESS Timing of Life",
           tabsetPanel(
             tabPanel("Overview",
               plotOutput("agemage_overview", height = 600)
-            )
+            ),
+            tabPanel("By gender",
+              plotOutput("agemage_by_gender", height = 600)
+              )
           )
         )}, # AGEMAGE tab
         {tabPanel("Beginning of old age",
@@ -467,6 +481,9 @@ ui <- {navbarPage("ESS Timing of Life",
           tabsetPanel(
             tabPanel("Overview",
               plotOutput("ageoage_overview", height = 600)
+            ),
+            tabPanel("By gender",
+              plotOutput("ageoage_by_gender", height = 600)
             )
           )
         )}  # AGEOAGE tab
@@ -488,9 +505,10 @@ ui <- {navbarPage("ESS Timing of Life",
       column(3, align = "left",
          selectInput("map_question",
            label = "Select variable",
-           choices = c("Too young to become parent" = "tygpnt_",
-                       "Ideal age to become parent" = "iagpnt_",
-                       "Too old to have more children" = "tochld_"))
+           choices = list("Child-bearing ages"= list("Too young to become parent" = "tygpnt_",
+                                                     "Ideal age to become parent" = "iagpnt_",
+                                                     "Too old to have more children" = "tochld_"),
+                           "Stages of life" = list("ageadlt","agemage","ageoage")))
       ),
       column(3, align = "left",
         selectInput("map_ballot",
@@ -563,6 +581,68 @@ ui <- {navbarPage("ESS Timing of Life",
   )}  # Data Export
 )}
 
+{
+  by_gender_plots <- function(data, var, limits, titles){
+    
+    ballot1 <- ggplot(data %>% subset(ballot == 1),
+                      mapping = aes(y = .data[[var]], fill = gender))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = c(0.96,0.80)) +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[1])
+    
+    ballot2 <- ggplot(data %>% subset(ballot == 2),
+                      mapping = aes(y = .data[[var]], fill = gender))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[2])
+    
+    return(grid.arrange(ballot1,ballot2, nrow = 2))
+  }
+  
+  by_year_plots   <- function(data, var, limits, titles){
+    
+    year1 <- ggplot(data %>% subset(ballot == 1),
+                    mapping = aes(y = .data[[var]], fill = year))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = c(0.96,0.80)) +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[1])+
+      scale_fill_manual(values=c("gold", "forestgreen"))
+    
+    year2 <- ggplot(data %>% subset(ballot == 2),
+                    mapping = aes(y = tygpnt, fill = year))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[2])+
+      scale_fill_manual(values=c("gold", "forestgreen"))
+    
+    grid.arrange(year1,year2, nrow = 2)
+  }
+} # Functions
+
 server <- function(input, output, session) {
   
   {
@@ -614,13 +694,13 @@ server <- function(input, output, session) {
   
   {
   output$selected_cntry <- 
-      renderText(sort(input$cntry %>% recode("AT"~"Austria,", "BE" ~ "Belgium,","BG" ~ "Bulgaria,", "CY" ~ "Cyprus,",
-                                             "CZ"~"Czechia,", "DK" ~ "Denmark,", "EE"~"Estonia,", "FI"~"Finland,",
-                                             "FR"~"France,", "DE"~"Germany,", "HU"~"Hungary,", "IE"~"Ireland,",
-                                             "IT"~"Italy,", "NL"~"Netherlands,", "NO"~"Norway,", "PL"~"Poland,",
-                                             "PT"~"Portugal,","RO"~"Romania,","RU"~"Russia,","RS"~"Serbia,",
-                                             "SK"~"Slovakia,","SI"~"Slovenia,","ES"~"Spain,", "SE"~"Sweden,",
-                                             "CH"~"Switzerland,", "UA"~"Ukraine,","GB"~"United Kingdom,")))
+      renderText(sort(input$cntry %>% recode("AT"~"Austria (AT),", "BE" ~ "Belgium (BE),","BG" ~ "Bulgaria (BG),", "CY" ~ "Cyprus (CY),",
+                                             "CZ"~"Czechia (CZ),", "DK" ~ "Denmark (DK),", "EE"~"Estonia(EE),", "FI"~"Finland (FI),",
+                                             "FR"~"France (FR),", "DE"~"Germany (DE),", "HU"~"Hungary (HU),", "IE"~"Ireland (IE),",
+                                             "IT"~"Italy (IT),", "NL"~"Netherlands (NL),", "NO"~"Norway (NO),", "PL"~"Poland (PL),",
+                                             "PT"~"Portugal (PT),","RO"~"Romania (RO),","RU"~"Russia (RU),","RS"~"Serbia (RS),",
+                                             "SK"~"Slovakia (SK),","SI"~"Slovenia (SI),","ES"~"Spain (EA),", "SE"~"Sweden (SE),",
+                                             "CH"~"Switzerland (CH),", "UA"~"Ukraine (UA),","GB"~"United Kingdom (GB),")))
   } # Selected country text
   
   {
@@ -808,13 +888,16 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      year1 <- ggplot(tol %>%
-                        subset(ballot == 1) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+                      subset(gender %in% chosen_gender) %>%
+                      subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+                      subset(cntry %in% chosen_cntry) %>%
+                      subset(edu %in% chosen_edu) %>%
+                      subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      year1 <- ggplot(data %>% subset(ballot == 1),
                       mapping = aes(y = tygpnt, fill = year))+
         geom_boxplot() +
         scale_y_continuous(limits = c(10,40),
@@ -827,13 +910,7 @@ server <- function(input, output, session) {
         labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')+
         scale_fill_manual(values=c("gold", "forestgreen"))
       
-      year2 <- ggplot(tol %>%
-                        subset(ballot == 2) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
+      year2 <- ggplot(data %>% subset(ballot == 2),
                       mapping = aes(y = tygpnt, fill = year))+
         geom_boxplot() +
         scale_y_continuous(limits = c(10,40),
@@ -1049,11 +1126,14 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
+      chosen_edu <- input$edu
+      
       ballot1 <- ggplot(tol %>%
                           subset(ballot == 1) %>%
                           subset(gender != "No answer") %>%
                           subset(year %in% chosen_year) %>%
                           subset(cntry %in% chosen_cntry) %>%
+                          subset(edu %in% chosen_edu) %>%
                           subset(agea >= input$age[1] & agea <= input$age[2]),
                         mapping = aes(y = iagpnt, fill = gender))+
         geom_boxplot() +
@@ -1071,6 +1151,7 @@ server <- function(input, output, session) {
                           subset(gender != "No answer") %>%
                           subset(year %in% chosen_year) %>%
                           subset(cntry %in% chosen_cntry) %>%
+                          subset(edu %in% chosen_edu) %>%
                           subset(agea >= input$age[1] & agea <= input$age[2]),
                         mapping = aes(y = tygpnt, fill = gender))+
         geom_boxplot() +
@@ -1098,11 +1179,14 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
+      chosen_edu <- input$edu
+      
       year1 <- ggplot(tol %>%
                         subset(ballot == 1) %>%
                         subset(gender != "No answer") %>%
                         subset(gender %in% chosen_gender) %>%
                         subset(cntry %in% chosen_cntry) %>%
+                        subset(edu %in% chosen_edu) %>%
                         subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
                         subset(agea >= input$age[1] & agea <= input$age[2]),
                       mapping = aes(y = iagpnt, fill = year))+
@@ -1122,6 +1206,7 @@ server <- function(input, output, session) {
                         subset(gender != "No answer") %>%
                         subset(gender %in% chosen_gender) %>%
                         subset(cntry %in% chosen_cntry) %>%
+                        subset(edu %in% chosen_edu) %>%
                         subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
                         subset(agea >= input$age[1] & agea <= input$age[2]),
                       mapping = aes(y = tygpnt, fill = year))+
@@ -1614,6 +1699,29 @@ server <- function(input, output, session) {
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
     })
+    
+    output$ageadlt_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "ageadlt", limits = c(10,40), titles = c("Title1","Title2"))
+    })
   } # AGEADLT plots
   
   {
@@ -1704,6 +1812,29 @@ server <- function(input, output, session) {
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
     })
+    
+    output$agemage_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "agemage", limits = c(20,60), titles = c("Title1","Title2"))
+    })
   } # AGEMAGE plots
   
   {
@@ -1793,6 +1924,29 @@ server <- function(input, output, session) {
       tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
       grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+    })
+    
+    output$ageoage_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "ageoage", limits = c(30,80), titles = c("Title1","Title2"))
     })
   } # AGEOAGE plots
   
