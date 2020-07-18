@@ -27,6 +27,10 @@
   `%notin%` = Negate(`%in%`)
   tol <- as.data.frame(read.spss("data/tol.sav"))
   tol_full <- tol
+  # tol_full$cntry[which(tol_full$cntry == "EI")] <- "IE"
+  # tol_full$cntry[which(tol_full$cntry == "ES")] <- "EA"
+  # tol_full$cntry[which(tol_full$cntry == "SL")] <- "SI"
+  # tol_full$cntry[which(tol_full$cntry == "UK")] <- "GB"
   tol <- na.omit(tol)
   agg_3 <- as.data.frame(read.spss("data/agg_3.sav"))
   agg_9 <- as.data.frame(read.spss("data/agg_9.sav"))
@@ -62,10 +66,12 @@
   world$name[which(world$name == "SL")] <- "SI"
   world$name[which(world$name == "UK")] <- "GB"
   
+
+  
   world$code <- tolower(world$name)
   
   
-  code <- sort(c("AT","BE","BG","CH","CY","DE","DK","EA","EE","FI","FR","GB","HU",
+  {code <- sort(c("AT","BE","BG","CH","CY","DE","DK","EA","EE","FI","FR","GB","HU",
                  "IE","NL","NO","PL","PT","RU","SE","SI","SK","UA","CZ","IT","RS"))
   iso <- data.frame(code)
   iso$country <- recode(code, "AT"~"Austria","BE"~"Belgium","BG"~"Bulgaria","CH"~"Switzerland","CY"~"Cyprus",
@@ -76,7 +82,7 @@
                         "EE"~"Estonia")
   iso1 <- iso[1:9,]
   iso2 <- iso[10:18,]
-  iso3 <- iso[19:26,]
+  iso3 <- iso[19:26,]} # ISO
   
 } # Data setup
 
@@ -132,26 +138,27 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                )
                
              ),
-             br(),
-             tabsetPanel(
-               tabPanel("Show country codes",
-                 fluidRow(
-                   br(),
-                   column(4,
-                      gt(iso1) %>% tab_options(table.width = 180)
-                    ),
-                   column(4,
-                      gt(iso2) %>% tab_options( table.width = 180)
-                    ),
-                   column(4,
-                      gt(iso3) %>% tab_options( table.width = 180)
-                    )
-                  )
-                ),
-                tabPanel(
-                  "Hide country codes"
-                )
-             )
+             br()
+             # ,
+             # tabsetPanel(
+             #   tabPanel("Show country codes",
+             #     fluidRow(
+             #       br(),
+             #       column(4,
+             #          gt(iso1) %>% tab_options(table.width = 180)
+             #        ),
+             #       column(4,
+             #          gt(iso2) %>% tab_options( table.width = 180)
+             #        ),
+             #       column(4,
+             #          gt(iso3) %>% tab_options( table.width = 180)
+             #        )
+             #      )
+             #    ),
+             #    tabPanel(
+             #      "Hide country codes"
+             #    )
+             # )
              
       ),
       column(3,
@@ -458,6 +465,15 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
             ),
             tabPanel("By gender",
               plotOutput("ageadlt_by_gender", height = 600)
+            ),
+            tabPanel("By year",
+              plotOutput("ageadlt_by_year", height = 600)
+            ),
+            tabPanel("By gender asked about",
+              plotOutput("ageadlt_by_ballot", height = 600)
+            ),
+            tabPanel("By cohort",
+              plotOutput("ageadlt_by_cohort", height = 600)
             )
           )
         )}, # AGEADLT tab
@@ -471,7 +487,16 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
             ),
             tabPanel("By gender",
               plotOutput("agemage_by_gender", height = 600)
-              )
+              ),
+            tabPanel("By year",
+              plotOutput("agemage_by_year", height = 600)
+            ),
+            tabPanel("By gender asked about",
+              plotOutput("agemage_by_ballot", height = 600)
+            ),
+            tabPanel("By cohort",
+              plotOutput("agemage_by_cohort", height = 600)
+            )
           )
         )}, # AGEMAGE tab
         {tabPanel("Beginning of old age",
@@ -484,6 +509,15 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
             ),
             tabPanel("By gender",
               plotOutput("ageoage_by_gender", height = 600)
+            ),
+            tabPanel("By year",
+              plotOutput("ageoage_by_year", height = 600)
+            ),
+            tabPanel("By gender asked about",
+              plotOutput("ageoage_by_ballot", height = 600)
+            ),
+            tabPanel("By cohort",
+              plotOutput("ageoage_by_cohort", height = 600)
             )
           )
         )}  # AGEOAGE tab
@@ -582,6 +616,39 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
 )}
 
 {
+  overview_plots  <- function(data, table_data1, table_data2, var, limits, titles){
+    p1 <- ggplot(data %>% subset(ballot == 1),
+                 mapping = aes(y = .data[[var]]))+
+      geom_boxplot(fill = "#F37E7E") +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[1])
+    
+    tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+    tbl1 <- tableGrob(t(table_data1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+    
+    p2 <- ggplot(data %>% subset(ballot == 2),
+                 mapping = aes(y = .data[[var]]))+
+      geom_boxplot(fill = "#F37E7E") +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[2])
+    
+    tbl2 <- tableGrob(t(table_data2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
+    
+    grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+  }
+  
   by_gender_plots <- function(data, var, limits, titles){
     
     ballot1 <- ggplot(data %>% subset(ballot == 1),
@@ -627,7 +694,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
       scale_fill_manual(values=c("gold", "forestgreen"))
     
     year2 <- ggplot(data %>% subset(ballot == 2),
-                    mapping = aes(y = tygpnt, fill = year))+
+                    mapping = aes(y = .data[[var]], fill = year))+
       geom_boxplot() +
       scale_y_continuous(limits = limits,
                          breaks = seq(0,100,10)) +
@@ -640,6 +707,66 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
       scale_fill_manual(values=c("gold", "forestgreen"))
     
     grid.arrange(year1,year2, nrow = 2)
+  }
+  
+  by_ballot_plots <- function(data, var, limits, titles){
+    women <- ggplot(data %>%
+                      subset(gender == "Female"),
+                    mapping = aes(y = .data[[var]], fill = ballot))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = c(0.96,0.80)) +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title= titles[1])+
+      scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
+    
+    men <- ggplot(data %>%
+                    subset(gender == "Male"),
+                  mapping = aes(y = .data[[var]], fill = ballot))+
+      geom_boxplot() +
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      facet_wrap(~ cntry, nrow = 1) +
+      labs(title = titles[2])
+    
+    grid.arrange(women,men, nrow = 2)
+  }
+  
+  by_cohort_plots <- function(data, var, limits, titles){
+    cohort1 <- ggplot(data %>% subset(ballot == "1"),
+                      mapping = aes(y = .data[[var]], fill = cohort))+
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = c(0.96,0.80)) +
+      geom_boxplot() +
+      facet_wrap(~cntry, nrow = 1)+
+      labs(title= titles[1])+
+      scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+    
+    cohort2 <- ggplot(data %>% subset(ballot == "2"),
+                      mapping = aes(y = .data[[var]], fill = cohort))+
+      scale_y_continuous(limits = limits,
+                         breaks = seq(0,100,10)) +
+      theme(axis.title.y = element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "none") +
+      geom_boxplot() +
+      facet_wrap(~cntry, nrow = 1)+
+      labs(title= titles[2])
+    
+    grid.arrange(cohort1, cohort2, nrow = 2)
   }
 } # Functions
 
@@ -681,7 +808,7 @@ server <- function(input, output, session) {
       chosen_edu <- input$edu
       
       paste(
-        nrow(tol %>%
+        nrow(tol_full %>%
                subset(gender %in% chosen_gender) %>%
                subset(year %in% chosen_year) %>%
                subset(cntry %in% chosen_cntry) %>%
@@ -726,7 +853,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, ballot, tygpnt))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
@@ -734,8 +861,15 @@ server <- function(input, output, session) {
       data_agg1$median <- 0
       data_agg1$total_N <- 0
       
-      col_order <- c("cntry", "mean", "se", "median","n")
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
       data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
       
       for (i in data_agg1$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
@@ -745,41 +879,6 @@ server <- function(input, output, session) {
         data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
       }
       
-      p1 <- ggplot(data %>% subset(ballot == 1),
-                   mapping = aes(y = tygpnt))+
-        geom_boxplot(fill = "#F37E7E") +
-        scale_y_continuous(limits = c(10,50),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
-      
-      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
-      
-      p2 <- ggplot(data %>% subset(ballot == 2),
-                   mapping = aes(y = tygpnt))+
-        geom_boxplot(fill = "#F37E7E") +
-        scale_y_continuous(limits = c(10,50),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a man is generally too young to become a father?"')
-      
-      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
-      data_agg2$mean <- 0
-      data_agg2$se <- 0
-      data_agg2$median <- 0
-      data_agg2$total_N <- 0
-      
-      data_agg2 <- data_agg2[, col_order]
-      
       for (i in data_agg2$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
         data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)[1] %>% round(digits = 2)
@@ -788,11 +887,10 @@ server <- function(input, output, session) {
         data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
       
-      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
-      
-      grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
-      
-    })
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "tygpnt", limits = c(10,40),
+                     titles = c('"Before what age would you say a woman is generally too young to become a mother?"',
+                                '"Before what age would you say a man is generally too young to become a father?"'))
+    }) # Function
     
     output$tygpnt_by_gender <- renderPlot({
       
@@ -815,66 +913,10 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
-      data_agg1$mean <- 0
-      data_agg1$se <- 0
-      data_agg1$median <- 0
-      
-      col_order <- c("cntry", "mean", "se", "median","n")
-      data_agg1 <- data_agg1[, col_order]
-      
-      for (i in data_agg1$cntry){
-        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
-        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)) %>% round(digits = 5)
-        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tygpnt) %>% round(digits = 2)
-      }
-      
-      ballot1 <- ggplot(data %>% subset(ballot == 1),
-                        mapping = aes(y = tygpnt, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')
-      
-      tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-      tbl1 <- tableGrob(t(data_agg1), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
-      
-      ballot2 <- ggplot(data %>% subset(ballot == 2),
-                        mapping = aes(y = tygpnt, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a man is generally too young to become a father?"')
-      
-      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
-      data_agg2$mean <- 0
-      data_agg2$se <- 0
-      data_agg2$median <- 0
-      
-      data_agg2 <- data_agg2[, col_order]
-      
-      for (i in data_agg2$cntry){
-        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
-        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)) %>% round(digits = 5)
-        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tygpnt) %>% round(digits = 2)
-      }
-      
-      tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "N"), theme=tt)
-      
-      grid.arrange(ballot1, ballot2, nrow = 2)
-    })
+      by_gender_plots(data = data, var = "tygpnt", limits = c(10,40), 
+                      titles = c('"Before what age would you say a woman is generally too young to become a mother?"',
+                                 '"Before what age would you say a man is generally too young to become a father?"'))
+    }) # Function
     
     output$tygpnt_by_year <- renderPlot({
       
@@ -897,34 +939,10 @@ server <- function(input, output, session) {
                       subset(edu %in% chosen_edu) %>%
                       subset(agea >= input$age[1] & agea <= input$age[2])
       
-      year1 <- ggplot(data %>% subset(ballot == 1),
-                      mapping = aes(y = tygpnt, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a woman is generally too young to become a mother?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
-      
-      year2 <- ggplot(data %>% subset(ballot == 2),
-                      mapping = aes(y = tygpnt, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"Before what age would you say a man is generally too young to become a father?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
-      
-      grid.arrange(year1,year2, nrow = 2)
-    })
+      by_year_plots(data = data, var = "tygpnt", limits = c(10,40), 
+                    titles = c('"Before what age would you say a woman is generally too young to become a mother?"',
+                               '"Before what age would you say a man is generally too young to become a father?"'))
+    }) # Function
     
     output$tygpnt_by_ballot <- renderPlot({
       
@@ -938,41 +956,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      women <- ggplot(tol %>%
-                        subset(gender == "Female") %>%
-                        subset(year %in% chosen_year) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = tygpnt, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title='"Before what age would you say a ____ is generally too young to become a parent?" (WOMEN\'s responses)')+
-        scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
+      chosen_edu <- input$edu
       
-      men <- ggplot(tol %>%
-                      subset(gender == "Male") %>%
-                      subset(year %in% chosen_year) %>%
-                      subset(cntry %in% chosen_cntry) %>%
-                      subset(agea >= input$age[1] & agea <= input$age[2]),
-                    mapping = aes(y = tygpnt, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title ='"Before what age would you say a ____ is generally too young to become a parent?" (MEN\'s responses)')
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
       
-      grid.arrange(women,men, nrow = 2)
-    })
+      by_ballot_plots(data = data, var = "tygpnt", limits = c(10,40), 
+                      titles = c('"Before what age would you say a ____ is generally too young to become a parent?" (WOMEN\'s responses)',
+                                 '"Before what age would you say a ____ is generally too young to become a parent?" (MEN\'s responses)'))
+    }) # Function
     
     output$tygpnt_by_cohort <- renderPlot({
       
@@ -986,41 +981,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      cohort1 <- ggplot(tol %>%
-                          subset(ballot == "1") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = tygpnt, fill = cohort))+
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
-        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      chosen_edu <- input$edu
       
-      cohort2 <- ggplot(tol %>%
-                          subset(ballot == "2") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = tygpnt, fill = cohort))+
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
       
-      grid.arrange(cohort1, cohort2, nrow = 2)
-    })
+      by_cohort_plots(data = data, var = "tygpnt", limits =c(10,40),
+                      titles = c('"Before what age would you say a woman is generally too young to become a parent?"',
+                                 '"Before what age would you say a man is generally too young to become a parent?"'))
+    }) # Function
   } # TYGPNT plots
   
   {
@@ -1046,7 +1018,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, iagpnt, ballot))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
@@ -1128,44 +1100,17 @@ server <- function(input, output, session) {
       
       chosen_edu <- input$edu
       
-      ballot1 <- ggplot(tol %>%
-                          subset(ballot == 1) %>%
-                          subset(gender != "No answer") %>%
-                          subset(year %in% chosen_year) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(edu %in% chosen_edu) %>%
-                          subset(agea >= input$age[1] & agea <= input$age[2]),
-                        mapping = aes(y = iagpnt, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"In your opinion, what is the ideal age for a girl or woman to become a mother?"')
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
       
-      ballot2 <- ggplot(tol %>%
-                          subset(ballot == 2) %>%
-                          subset(gender != "No answer") %>%
-                          subset(year %in% chosen_year) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(edu %in% chosen_edu) %>%
-                          subset(agea >= input$age[1] & agea <= input$age[2]),
-                        mapping = aes(y = tygpnt, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"In your opinion, what is the ideal age for a boy or man to become a father?"')
-      
-      grid.arrange(ballot1,ballot2, nrow = 2)
-    })
+      by_gender_plots(data = data, var = "iagpnt", limits = c(10,40), 
+                      titles = c('"In your opinion, what is the ideal age for a girl or woman to become a mother?"',
+                                 '"In your opinion, what is the ideal age for a boy or man to become a father?"'))
+    }) # Function
     
     output$iagpnt_by_year <- renderPlot({
       
@@ -1181,48 +1126,17 @@ server <- function(input, output, session) {
       
       chosen_edu <- input$edu
       
-      year1 <- ggplot(tol %>%
-                        subset(ballot == 1) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(edu %in% chosen_edu) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = iagpnt, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"In your opinion, what is the ideal age for a girl or woman to become a mother?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
       
-      year2 <- ggplot(tol %>%
-                        subset(ballot == 2) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(edu %in% chosen_edu) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = tygpnt, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"In your opinion, what is the ideal age for a boy or man to become a father?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
-      
-      grid.arrange(year1,year2, nrow = 2)
-    })
+      by_year_plots(data = data, var = "iagpnt", limits = c(10,40), 
+                    titles = c('"In your opinion, what is the ideal age for a girl or woman to become a mother?"',
+                               '"In your opinion, what is the ideal age for a boy or man to become a father?"'))
+    }) # Function
     
     output$iagpnt_by_ballot <- renderPlot({
       
@@ -1236,41 +1150,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      women <- ggplot(tol %>%
-                        subset(gender == "Female") %>%
-                        subset(year %in% chosen_year) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = iagpnt, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title='"In your opinion, what is the ideal age for a ____ to become a parent?" (WOMEN\'s responses)')+
-        scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
+      chosen_edu <- input$edu
       
-      men <- ggplot(tol %>%
-                      subset(gender == "Male") %>%
-                      subset(year %in% chosen_year) %>%
-                      subset(cntry %in% chosen_cntry) %>%
-                      subset(agea >= input$age[1] & agea <= input$age[2]),
-                    mapping = aes(y = tygpnt, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title ='"In your opinion, what is the ideal age for a ____ to become a mother/father?" (MEN\'s responses)')
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
       
-      grid.arrange(women,men, nrow = 2)
-    })
+      by_ballot_plots(data = data, var = "iagpnt", limits = c(10,40), 
+                      titles = c('"In your opinion, what is the ideal age for a ____ to become a parent?" (WOMEN\'s responses)',
+                                 '"In your opinion, what is the ideal age for a ____ to become a parent?" (MEN\'s responses)'))
+    }) # Function
     
     output$iagpnt_by_cohort <- renderPlot({
       
@@ -1284,41 +1175,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      cohort1 <- ggplot(tol %>%
-                          subset(ballot == "1") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = iagpnt, fill = cohort))+
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
-        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      chosen_edu <- input$edu
       
-      cohort2 <- ggplot(tol %>%
-                          subset(ballot == "2") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = iagpnt, fill = cohort))+
-        scale_y_continuous(limits = c(10,40),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
       
-      grid.arrange(cohort1, cohort2, nrow = 2)
-    })
+      by_cohort_plots(data = data, var = "iagpnt", limits =c(10,40),
+                      titles = c('"In your opinion, what is the ideal age for a girl or woman to become a mother?"',
+                                 '"In your opinion, what is the ideal age for a boy or man to become a father?"'))
+    }) # Function
   } # IAGPNT plots
   
   {
@@ -1424,42 +1292,19 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      ballot1 <- ggplot(tol %>%
-                          subset(ballot == 1) %>%
-                          subset(gender != "No answer") %>%
-                          subset(year %in% chosen_year) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(agea >= input$age[1] & agea <= input$age[2]),
-                        mapping = aes(y = tochld, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"After what age would you say a woman is generally too old to consider having any more children?"')
+      chosen_edu <- input$edu
       
-      ballot2 <- ggplot(tol %>%
-                          subset(ballot == 2) %>%
-                          subset(gender != "No answer") %>%
-                          subset(year %in% chosen_year) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(agea >= input$age[1] & agea <= input$age[2]),
-                        mapping = aes(y = tochld, fill = gender))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"After what age would you say a man is generally too old to consider having any more children?"')
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
       
-      grid.arrange(ballot1,ballot2, nrow = 2)
-    })
+      by_gender_plots(data = data, var = "tochld", limits = c(20,60), 
+                      titles = c('"After what age would you say a woman is generally too old to consider having any more children?"',
+                                 '"After what age would you say a man is generally too old to consider having any more children?"'))
+    }) # Function
     
     output$tochld_by_year <- renderPlot({
       
@@ -1473,46 +1318,19 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      year1 <- ggplot(tol %>%
-                        subset(ballot == 1) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = tochld, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"After what age would you say a woman is generally too old to consider having any more children?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
+      chosen_edu <- input$edu
       
-      year2 <- ggplot(tol %>%
-                        subset(ballot == 2) %>%
-                        subset(gender != "No answer") %>%
-                        subset(gender %in% chosen_gender) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = tochld, fill = year))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title = '"After what age would you say a man is generally too old to consider having any more children?"')+
-        scale_fill_manual(values=c("gold", "forestgreen"))
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
       
-      grid.arrange(year1,year2, nrow = 2)
-    })
+      by_year_plots(data = data, var = "iagpnt", limits = c(10,40), 
+                    titles = c('"After what age would you say a woman is generally too old to consider having any more children?"',
+                               '"After what age would you say a man is generally too old to consider having any more children?"'))
+    }) # Function
     
     output$tochld_by_ballot <- renderPlot({
       
@@ -1526,41 +1344,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      women <- ggplot(tol %>%
-                        subset(gender == "Female") %>%
-                        subset(year %in% chosen_year) %>%
-                        subset(cntry %in% chosen_cntry) %>%
-                        subset(agea >= input$age[1] & agea <= input$age[2]),
-                      mapping = aes(y = tochld, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title='"After what age would you say a ____ is generally too old to consider having any more children?" (WOMEN\'s responses)')+
-        scale_fill_discrete(name = "gender asked",labels = c("woman","man"))
+      chosen_edu <- input$edu
       
-      men <- ggplot(tol %>%
-                      subset(gender == "Male") %>%
-                      subset(year %in% chosen_year) %>%
-                      subset(cntry %in% chosen_cntry) %>%
-                      subset(agea >= input$age[1] & agea <= input$age[2]),
-                    mapping = aes(y = tochld, fill = ballot))+
-        geom_boxplot() +
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        facet_wrap(~ cntry, nrow = 1) +
-        labs(title ='"After what age would you say a ____ is generally too old to consider having any more children?" (MEN\'s responses)')
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
       
-      grid.arrange(women,men, nrow = 2)
-    })
+      by_ballot_plots(data = data, var = "iagpnt", limits = c(10,40), 
+                      titles = c('"After what age would you say a ____ is generally too old to consider having any more children?" (WOMEN\'s responses)',
+                                 '"After what age would you say a ____ is generally too old to consider having any more children?" (MEN\'s responses)'))
+    }) # Function
     
     output$tochld_by_cohort <- renderPlot({
       
@@ -1574,41 +1369,18 @@ server <- function(input, output, session) {
       
       chosen_cntry <- input$cntry
       
-      cohort1 <- ggplot(tol %>%
-                          subset(ballot == "1") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = tochld, fill = cohort))+
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = c(0.96,0.80)) +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a woman is generally too young to become a parent?"')+
-        scale_fill_discrete(name = "Cohort",labels = c("- 1959","1960 - 1989","1990 - "))
+      chosen_edu <- input$edu
       
-      cohort2 <- ggplot(tol %>%
-                          subset(ballot == "2") %>%
-                          subset(gender %in% chosen_gender) %>%
-                          subset(cntry %in% chosen_cntry) %>%
-                          subset(year %in% chosen_year),
-                        mapping = aes(y = tochld, fill = cohort))+
-        scale_y_continuous(limits = c(20,60),
-                           breaks = seq(0,100,10)) +
-        theme(axis.title.y = element_blank(),
-              axis.text.x=element_blank(),
-              axis.ticks.x=element_blank(),
-              legend.position = "none") +
-        geom_boxplot() +
-        facet_wrap(~cntry, nrow = 1)+
-        labs(title='"Before what age would you say a man is generally too young to become a parent?"')
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
       
-      grid.arrange(cohort1, cohort2, nrow = 2)
-    })
+      by_cohort_plots(data = data, var = "tochld", limits =c(10,40),
+                      titles = c('"After what age would you say a woman is generally too old to consider having any more children?"',
+                                 '"After what age would you say a man is generally too old to consider having any more children?"'))
+    }) # Function
   } # TOCHLD plots
   
   {
@@ -1721,7 +1493,82 @@ server <- function(input, output, session) {
         subset(edu %in% chosen_edu)
       
       by_gender_plots(data = data, var = "ageadlt", limits = c(10,40), titles = c("Title1","Title2"))
-    })
+    }) # Function
+    
+    output$ageadlt_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "ageadlt", limits = c(10,40), 
+                    titles = c('"At what age, approximately, would you say girls or women become adults?"',
+                               '"At what age, approximately, would you say boys or men become adults?"'))
+    }) # Function
+    
+    output$ageadlt_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "ageadlt", limits = c(10,40), 
+                      titles = c('"At what age, approximately, would you say girls or women become adults?"',
+                                 '"At what age, approximately, would you say boys or men become adults?"'))
+    }) # Function
+    
+    output$ageadlt_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "ageadlt", limits =c(10,40),
+                      titles = c('"At what age, approximately, would you say ____ become adults?" (WOMEN\'s responses)',
+                                 '"At what age, approximately, would you say ____ become adults?" (MEN\'s responses)'))
+    }) # Function
   } # AGEADLT plots
   
   {
@@ -1834,7 +1681,82 @@ server <- function(input, output, session) {
         subset(edu %in% chosen_edu)
       
       by_gender_plots(data = data, var = "agemage", limits = c(20,60), titles = c("Title1","Title2"))
-    })
+    }) # Function
+    
+    output$agemage_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "agemage", limits = c(20,60), 
+                    titles = c('"At what age, approximately, would you say girls or women become middle aged?"',
+                               '"At what age, approximately, would you say boys or men become middle aged?"'))
+    }) # Function
+    
+    output$agemage_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "agemage", limits = c(20,60), 
+                      titles = c('"At what age, approximately, would you say girls or women reach middle age?"',
+                                 '"At what age, approximately, would you say boys or men reach middle age?"'))
+    }) # Function
+    
+    output$agemage_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "agemage", limits =c(20,60),
+                      titles = c('"At what age, approximately, would you say ____ reach middle age?" (WOMEN\'s responses)',
+                                 '"At what age, approximately, would you say ____ reach middle age?" (MEN\'s responses)'))
+    }) # Function
   } # AGEMAGE plots
   
   {
@@ -1947,7 +1869,82 @@ server <- function(input, output, session) {
         subset(edu %in% chosen_edu)
       
       by_gender_plots(data = data, var = "ageoage", limits = c(30,80), titles = c("Title1","Title2"))
-    })
+    }) # Function
+    
+    output$ageoage_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "ageoage", limits = c(30,80), 
+                    titles = c('"At what age, approximately, would you say girls or women reach old age?"',
+                               '"At what age, approximately, would you say boys or men reach old age?"'))
+    }) # Function
+    
+    output$ageoage_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "ageoage", limits = c(30,80),
+                      titles = c('"At what age, approximately, would you say girls or women reach old age?"',
+                                 '"At what age, approximately, would you say boys or men reach old age?"'))
+    }) # Function
+    
+    output$ageoage_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "ageoage", limits =c(30,80),
+                      titles = c('"At what age, approximately, would you say ____ reach old age?" (WOMEN\'s responses)',
+                                 '"At what age, approximately, would you say ____ reach old age?" (MEN\'s responses)'))
+    }) # Function
   } # AGEOAGE plots
   
   {
@@ -1975,7 +1972,8 @@ server <- function(input, output, session) {
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
             axis.title.x = element_blank(),
-            legend.position = c(0.04, 0.94))+
+            legend.position = c(0.04, 0.94),
+            panel.grid = element_blank(),)+
       facet_wrap(~year, nrow = 2)+
       scale_alpha_discrete(range = c(0.4,1)) +
       scale_fill_brewer(palette = "Dark"
@@ -2018,6 +2016,7 @@ server <- function(input, output, session) {
       ggtitle("2018")+
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank())
+    
     legend <- grid.arrange(legend1, legend2, nrow = 2)
     
     ggarrange(map, legend, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
