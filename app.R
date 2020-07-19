@@ -522,6 +522,52 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
           )
         )}  # AGEOAGE tab
       ),
+      navbarMenu("Retirement",
+       {tabPanel("Too young to retire",
+         h3("TYGRTR: Before what age, approximately, would you say women/men are too young to retire?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("tygrtr_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("tygrtr_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("tygrtr_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("tygrtr_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("tygrtr_by_cohort", height = 600)
+           )
+         )
+       )}, # TYGRTR tab
+       {tabPanel("Ideal age to retire",
+                 h3("IAGRTR: In your opinion, what is the ideal age for a woman/man to retire permanently?",
+                    align = "center"),
+                 br(),
+                 tabsetPanel(
+                   tabPanel("Overview",
+                            plotOutput("iagrtr_overview", height = 600)
+                   ),
+                   tabPanel("By gender",
+                            plotOutput("iagrtr_by_gender", height = 600)
+                   ),
+                   tabPanel("By year",
+                            plotOutput("iagrtr_by_year", height = 600)
+                   ),
+                   tabPanel("By gender asked about",
+                            plotOutput("iagrtr_by_ballot", height = 600)
+                   ),
+                   tabPanel("By cohort",
+                            plotOutput("iagrtr_by_cohort", height = 600)
+                   )
+                 )
+       )}  # IAGRTR tab
+      ),
       tabPanel("Hide plots",
         br(),
         br(),
@@ -1789,8 +1835,15 @@ server <- function(input, output, session) {
       data_agg1$median <- 0
       data_agg1$total_N <- 0
       
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
       col_order <- c("cntry", "mean", "se", "median","n")
       data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
       
       for (i in data_agg1$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
@@ -1798,6 +1851,14 @@ server <- function(input, output, session) {
         data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$ageoage, design = design)) %>% round(digits = 5)
         data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$ageoage) %>% round(digits = 2)
         data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$ageoage) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
       
       p1 <- ggplot(data %>% subset(ballot == 1),
@@ -1827,21 +1888,7 @@ server <- function(input, output, session) {
         facet_wrap(~ cntry, nrow = 1) +
         labs(title = '"At what age, approximately, would you say men reach old age?"')
       
-      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
-      data_agg2$mean <- 0
-      data_agg2$se <- 0
-      data_agg2$median <- 0
-      data_agg2$total_N <- 0
-      
-      data_agg2 <- data_agg2[, col_order]
-      
-      for (i in data_agg2$cntry){
-        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
-        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)[1] %>% round(digits = 2)
-        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$ageoage, design = design)) %>% round(digits = 5)
-        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$ageoage) %>% round(digits = 2)
-        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
-      }
+
       
       tbl2 <- tableGrob(t(data_agg2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
       
@@ -1947,6 +1994,329 @@ server <- function(input, output, session) {
     }) # Function
   } # AGEOAGE plots
   
+  {
+    output$tygrtr_overview <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, tygrtr))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tygrtr, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygrtr, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tygrtr) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygrtr, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygrtr, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tygrtr) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "tygrtr", limits = c(40,80),
+                     titles = c('"Before what age would you say a woman is generally too young to retire?"',
+                                '"Before what age would you say a man is generally too young to retire?"'))
+    }) # Function
+    
+    output$tygrtr_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "tygrtr", limits = c(40,80), 
+                      titles = c('"Before what age would you say a woman is generally too young to retire?"',
+                                 '"Before what age would you say a man is generally too young to retire?"'))
+    }) # Function
+    
+    output$tygrtr_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "tygrtr", limits = c(40,80), 
+                    titles = c('"Before what age would you say a woman is generally too young to retire?"',
+                               '"Before what age would you say a man is generally too young to retire?"'))
+    }) # Function
+    
+    output$tygrtr_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "tygrtr", limits = c(40,80),
+                      titles = c('"Before what age would you say a ___ is generally too young to retire?" (WOMENS\'s responses)',
+                                 '"Before what age would you say a ___ is generally too young to retire?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$tygrtr_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "tygrtr", limits =c(40,80),
+                      titles = c('"Before what age would you say a woman is generally too young to retire?"',
+                                 '"Before what age would you say a man is generally too young to retire?"'))
+    }) # Function
+  } # TYGRTR plots
+  
+  {
+    output$iagrtr_overview <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, iagrtr))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$iagrtr, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$iagrtr, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$iagrtr) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$iagrtr, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$iagrtr, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$iagrtr) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "iagrtr", limits = c(40,80),
+                     titles = c('"In your opinion, what is the ideal age for a woman to retire permanently?"',
+                                '"In your opinion, what is the ideal age for a man to retire permanently?"'))
+    }) # Function
+    
+    output$iagrtr_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "iagrtr", limits = c(40,80), 
+                      titles = c('"In your opinion, what is the ideal age for a woman to retire permanently?"',
+                                 '"In your opinion, what is the ideal age for a man to retire permanently?"'))
+    }) # Function
+    
+    output$iagrtr_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "tygrtr", limits = c(40,80), 
+                    titles = c('"In your opinion, what is the ideal age for a woman to retire permanently?"',
+                               '"In your opinion, what is the ideal age for a man to retire permanently?"'))
+    }) # Function
+    
+    output$iagrtr_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "iagrtr", limits = c(40,80),
+                      titles = c('"In your opinion, what is the ideal age for a ____ to retire permanently?" (WOMENS\'s responses)',
+                                 '"In your opinion, what is the ideal age for a ____ to retire permanently?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$iagrtr_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "iagrtr", limits =c(40,80),
+                      titles = c('"In your opinion, what is the ideal age for a woman to retire permanently?"',
+                                 '"In your opinion, what is the ideal age for a man to retire permanently?"'))
+    }) # Function
+  } # IAGRTR plots
   {
   output$map <- renderPlot({
     
