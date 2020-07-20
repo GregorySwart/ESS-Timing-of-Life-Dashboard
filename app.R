@@ -108,7 +108,13 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
       hr(),
       br(),
       column(3,
-             img(src = "background1.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
+        img(src = "background1.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;"),
+        br(),
+        br(),
+        br(),
+        br(),
+        br(),
+        img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
       ),
       column(6,
              p("The European Social Survey (ESS) is an 
@@ -138,142 +144,131 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                )
                
              ),
-             br()
-             # ,
-             # tabsetPanel(
-             #   tabPanel("Show country codes",
-             #     fluidRow(
-             #       br(),
-             #       column(4,
-             #          gt(iso1) %>% tab_options(table.width = 180)
-             #        ),
-             #       column(4,
-             #          gt(iso2) %>% tab_options( table.width = 180)
-             #        ),
-             #       column(4,
-             #          gt(iso3) %>% tab_options( table.width = 180)
-             #        )
-             #      )
-             #    ),
-             #    tabPanel(
-             #      "Hide country codes"
-             #    )
-             # )
              
-      ),
-      column(3,
-             img(src = "background2.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;")
-      )
-    )}, # Introduction
-    {fluidRow(
-      br(),
-      hr(),
-      h3("Demographics selector", align = "center"),
-      br(),
-      column(3,
-        img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
-      ),
-      column(6,
-      p("In this section, you can subset the data that the plotting tabs below will take in to formulate box 
+             {fluidRow(
+
+               h3("Demographics selector", align = "center"),
+               br(),
+               # column(3,
+               #        img(src = "background_alt1.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
+               # ),
+               column(12,
+                      p("In this section, you can subset the data that the plotting tabs below will take in to formulate box 
         plots. Please note that for certain comparitive plots, some of the selectors will", strong("not"),
-        "work. For example, the gender comparison plots will include both genders, regardless of the selection 
+                        "work. For example, the gender comparison plots will include both genders, regardless of the selection 
         specified here, but the year of collection and age of respondents can be selected normally.",
-        style = "text-align: justify"),
-      br(),
-      {fluidRow(
-        column(6,
-          sliderInput("age",
-                      label = "Select Age Group",
-                      min = 15,
-                      max = 101,
-                      value = c(15, 101)),
-          selectInput("gender",
-                      label = "Select Gender",
-                      choices = c("Female and Male","Female","Male"),
-                      selected = "Female and Male"
-          ),
-          selectInput("year",
-                      label = "Select data collection Year",
-                      choices = c("2006 and 2018","2006","2018"),
-                      selected = "2018")
-        ),
-        column(6,
-          fluidRow(
-            column(12,
-              
-          checkboxGroupInput("edu",
-                             label = "Select Highest Education Level",
-                             choices = list("ES-ISCED I, less than lower secondary" = 1,
-                                            "ES-ISCED II, lower secondary" = 2,
-                                            "ES-ISCED IIIb, lower tier upper secondary" = 3,
-                                            "ES-ISCED IIIa, upper tier upper secondary" = 4,
-                                            "ES-ISCED IV, adv. vocational, sub-degree" = 5,
-                                            "ES-ISCED V1, lower tertiary, BA level" = 6,
-                                            "ES-ISCED V2, higher tertiary, >= MA level" = 7,
-                                            "Other/Missing data" =0),
-                             selected = c("ES-ISCED I, less than lower secondary" = 1,
-                                          "ES-ISCED II, lower secondary" = 2,
-                                          "ES-ISCED IIIb, lower tier upper secondary" = 3,
-                                          "ES-ISCED IIIa, upper tier upper secondary" = 4,
-                                          "ES-ISCED IV, adv. vocational, sub-degree" = 5,
-                                          "ES-ISCED V1, lower tertiary, BA level" = 6,
-                                          "ES-ISCED V2, higher tertiary, >= MA level" = 7,
-                                          "Other/Missing data" =0)),
-          actionButton("selectalledu", label = "Select/Deselect all")
-        )
-      )),
-      column(12,
-             checkboxGroupInput("cntry",
-                                label = "Select Country",
-                                inline = T,
-                                choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ",
-                                               "Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI",
-                                               "France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL",
-                                               "Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS",
-                                               "Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
-                                               "Ukraine" = "UA","UK" = "UK"),
-                                selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "EI", "ES", "FI", "FR", "HU",
-                                             "IT", "NL", "NO", "PL", "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK","EI","RS"))
-      ),
-      actionButton("selectall", label="Select/Deselect all")
-      
-      )}
+                        style = "text-align: justify"),
+                      br(),
+                      {fluidRow(
+                        column(6,
+                               sliderInput("age",
+                                           label = "Select Age Group",
+                                           min = 15,
+                                           max = 101,
+                                           value = c(15, 101)),
+                               selectInput("gender",
+                                           label = "Select Gender",
+                                           choices = c("Female and Male","Female","Male"),
+                                           selected = "Female and Male"
+                               ),
+                               selectInput("year",
+                                           label = "Select data collection Year",
+                                           choices = c("2006 and 2018","2006","2018"),
+                                           selected = "2018")
+                        ),
+                        column(6,
+                               fluidRow(
+                                 column(12,
+                                        
+                                        checkboxGroupInput("edu",
+                                                           label = "Select Highest Education Level",
+                                                           choices = list("ES-ISCED I, less than lower secondary" = 1,
+                                                                          "ES-ISCED II, lower secondary" = 2,
+                                                                          "ES-ISCED IIIb, lower tier upper secondary" = 3,
+                                                                          "ES-ISCED IIIa, upper tier upper secondary" = 4,
+                                                                          "ES-ISCED IV, adv. vocational, sub-degree" = 5,
+                                                                          "ES-ISCED V1, lower tertiary, BA level" = 6,
+                                                                          "ES-ISCED V2, higher tertiary, >= MA level" = 7,
+                                                                          "Other/Missing data" =0),
+                                                           selected = c("ES-ISCED I, less than lower secondary" = 1,
+                                                                        "ES-ISCED II, lower secondary" = 2,
+                                                                        "ES-ISCED IIIb, lower tier upper secondary" = 3,
+                                                                        "ES-ISCED IIIa, upper tier upper secondary" = 4,
+                                                                        "ES-ISCED IV, adv. vocational, sub-degree" = 5,
+                                                                        "ES-ISCED V1, lower tertiary, BA level" = 6,
+                                                                        "ES-ISCED V2, higher tertiary, >= MA level" = 7,
+                                                                        "Other/Missing data" =0)),
+                                        actionButton("selectalledu", label = "Select/Deselect all")
+                                 )
+                               )),
+                        column(12,
+                               checkboxGroupInput("cntry",
+                                                  label = "Select Country",
+                                                  inline = T,
+                                                  choices = list("Austria" = "AT","Belgium" = "BE", "Bulgaria" = "BG","Cyprus" = "CY","Czechia" = "CZ",
+                                                                 "Germany" = "DE","Denmark" = "DK","Estonia" = "EE","Spain" = "ES","Finland" = "FI",
+                                                                 "France" = "FR","Hungary" = "HU","Ireland" = "EI","Italy" = "IT","Netherlands" = "NL",
+                                                                 "Norway" = "NO","Poland" = "PL","Portugal" = "PT","Russia" = "RU","Serbia" = "RS",
+                                                                 "Sweden" = "SE","Slovakia" = "SK","Slovenia" = "SL","Switzerland" = "CH",
+                                                                 "Ukraine" = "UA","UK" = "UK"),
+                                                  selected = c("AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "EI", "ES", "FI", "FR", "HU",
+                                                               "IT", "NL", "NO", "PL", "PT", "RS", "RU", "SE", "SK", "SL", "UA", "UK","EI","RS"))
+                        ),
+                        actionButton("selectall", label="Select/Deselect all")
+                        
+                      )}
+               ),
+               # column(3,
+               #        img(src = "background_alt2.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
+               # ),
+
+             )} # Demographics selector
       ),
       column(3,
+             img(src = "background2.png", width = "70%",style="display: block; margin-left: auto; margin-right: auto;"),
+             br(),
+             br(),
+             br(),
+             br(),
+             br(),
              img(src = "background_alt2.png", width = "70%", style="display: block; margin-left: auto; margin-right: auto;")
       ),
-                      fluidRow(
-                        column(12, align= "center",
-                               hr(),
-                               {fluidRow(
-                                 column(1),
-                                 column(10,
-                                   h4(align = "center",
-                                      "You have selected",
-                                      strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
-                                      "respondents",
-                                      #                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")),
-                                      "in",
-                                      strong(span(textOutput("selected_year", inline = T), style = "color:darkred")),
-                                      "between the ages of",
-                                      strong(span(textOutput("selected_age_min", inline = T), style = "color:darkred")),
-                                      "and",
-                                      strong(span(textOutput("selected_age_max", inline = T), style = "color:darkred")),
-                                      "from the following countries:", tags$br(),
-                                      strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")), tags$br(),
-                                      "with highest achieved education being one of the following: ",
-                                      strong(span(textOutput("selected_edu", inline = T), style = "color:darkred")),
-                                      "(n =",
-                                      strong(span(textOutput("selected_n", inline = T), style = "color:darkred")),
-                                      span(").", .noWS = "outside")
-                                    )
+      fluidRow(
+        column(12,
+               fluidRow(
+                 column(12, align= "center",
+                        hr(),
+                        {fluidRow(
+                          column(1),
+                          column(10,
+                                 h4(align = "center",
+                                    "You have selected",
+                                    strong(span(textOutput("selected_gen", inline = T), style = "color:darkred")),
+                                    "respondents",
+                                    #                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")),
+                                    "in",
+                                    strong(span(textOutput("selected_year", inline = T), style = "color:darkred")),
+                                    "between the ages of",
+                                    strong(span(textOutput("selected_age_min", inline = T), style = "color:darkred")),
+                                    "and",
+                                    strong(span(textOutput("selected_age_max", inline = T), style = "color:darkred")),
+                                    "from the following countries:", tags$br(),
+                                    strong(span(textOutput("selected_cntry", inline = T), style = "color:darkred")), tags$br(),
+                                    "with highest achieved education being one of the following: ",
+                                    strong(span(textOutput("selected_edu", inline = T), style = "color:darkred")),
+                                    "(n =",
+                                    strong(span(textOutput("selected_n", inline = T), style = "color:darkred")),
+                                    span(").", .noWS = "outside")
                                  )
-                               )},  # Show selected N
-                               br(),
-                               #                textOutput("selected_cntry")
-                        )
-                      )
-                    )}, # Demographics selector
+                          )
+                        )},  # Show selected N
+                        br(),
+                        #                textOutput("selected_cntry")
+                 )
+               )
+        )
+      )
+    )}, # Introduction & Demographics
     {navbarPage("Question of interest", collapsable = TRUE,
       navbarMenu("Child-bearing ages",
         {tabPanel("Age too young to become a parent",
@@ -1358,7 +1353,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, ballot, tochld))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
@@ -1551,7 +1546,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, ballot, ageadlt))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
@@ -1739,7 +1734,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, ballot, agemage))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
@@ -1927,7 +1922,7 @@ server <- function(input, output, session) {
         subset(agea >= input$age[1] & agea <= input$age[2]) %>%
         subset(edu %in% chosen_edu)
       
-      data <- na.omit(data_full)
+      data <- na.omit(data_full %>% select(cntry, ballot, ageoage))
       
       data_agg1 <- count(data %>% subset(ballot == 1), cntry)
       data_agg1$mean <- 0
