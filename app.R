@@ -203,7 +203,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
               
           checkboxGroupInput("edu",
                              label = "Select Highest Education Level",
-                             choices = list("ES-ISCED I , less than lower secondary" = 1,
+                             choices = list("ES-ISCED I, less than lower secondary" = 1,
                                             "ES-ISCED II, lower secondary" = 2,
                                             "ES-ISCED IIIb, lower tier upper secondary" = 3,
                                             "ES-ISCED IIIa, upper tier upper secondary" = 4,
@@ -211,7 +211,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                                             "ES-ISCED V1, lower tertiary, BA level" = 6,
                                             "ES-ISCED V2, higher tertiary, >= MA level" = 7,
                                             "Other/Missing data" =0),
-                             selected = c("ES-ISCED I , less than lower secondary" = 1,
+                             selected = c("ES-ISCED I, less than lower secondary" = 1,
                                           "ES-ISCED II, lower secondary" = 2,
                                           "ES-ISCED IIIb, lower tier upper secondary" = 3,
                                           "ES-ISCED IIIa, upper tier upper secondary" = 4,
@@ -523,7 +523,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
         )}  # AGEOAGE tab
       ),
       navbarMenu("Retirement",
-       {tabPanel("Too young to retire",
+        {tabPanel("Age too young to retire",
          h3("TYGRTR: Before what age, approximately, would you say women/men are too young to retire?",
             align = "center"),
          br(),
@@ -545,28 +545,118 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
            )
          )
        )}, # TYGRTR tab
-       {tabPanel("Ideal age to retire",
-                 h3("IAGRTR: In your opinion, what is the ideal age for a woman/man to retire permanently?",
-                    align = "center"),
-                 br(),
-                 tabsetPanel(
-                   tabPanel("Overview",
-                            plotOutput("iagrtr_overview", height = 600)
-                   ),
-                   tabPanel("By gender",
-                            plotOutput("iagrtr_by_gender", height = 600)
-                   ),
-                   tabPanel("By year",
-                            plotOutput("iagrtr_by_year", height = 600)
-                   ),
-                   tabPanel("By gender asked about",
-                            plotOutput("iagrtr_by_ballot", height = 600)
-                   ),
-                   tabPanel("By cohort",
-                            plotOutput("iagrtr_by_cohort", height = 600)
-                   )
-                 )
-       )}  # IAGRTR tab
+        {tabPanel("Ideal age to retire",
+         h3("IAGRTR: In your opinion, what is the ideal age for a woman/man to retire permanently?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("iagrtr_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("iagrtr_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("iagrtr_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("iagrtr_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("iagrtr_by_cohort", height = 600)
+           )
+         )
+       )}, # IAGRTR tab
+        {tabPanel("Age too old to be working 20 hrs",
+         h3("TOWKHT: After what age would you say a woman/man is generally too old to be working 20 hours or more per week?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("towkht_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("towkht_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("towkht_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("towkht_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("towkht_by_cohort", height = 600)
+           )
+         )
+       )}  # TOWKHT tab
+      ),
+      navbarMenu("Living arrangement",
+        {tabPanel("Age too young to move in with partner",
+         h3("TYGLVP: Before what age would you say a woman/man is generally too young to start living with a partner she/he is not married to?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("tyglvp_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("tyglvp_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("tyglvp_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("tyglvp_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("tyglvp_by_cohort", height = 600)
+           )
+         )
+       )}, # TYGRTR tab
+        {tabPanel("Ideal age to move in with partner",
+         h3("IAGLPTN: In your opinion, what is the ideal age for a girl/boy or woman/man to start living with a partner she/he is not married to?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("iaglptn_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("iaglptn_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("iaglptn_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("iaglptn_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("iaglptn_by_cohort", height = 600)
+           )
+         )
+       )}, # IAGLPTN tab
+        {tabPanel("Age too old to still be living with parents",
+         h3("TOLVPNT: After what age would you say a woman/man is generally too old to still be living with her/his parents?",
+            align = "center"),
+         br(),
+         tabsetPanel(
+           tabPanel("Overview",
+                    plotOutput("tolvpnt_overview", height = 600)
+           ),
+           tabPanel("By gender",
+                    plotOutput("tolvpnt_by_gender", height = 600)
+           ),
+           tabPanel("By year",
+                    plotOutput("tolvpnt_by_year", height = 600)
+           ),
+           tabPanel("By gender asked about",
+                    plotOutput("tolvpnt_by_ballot", height = 600)
+           ),
+           tabPanel("By cohort",
+                    plotOutput("tolvpnt_by_cohort", height = 600)
+           )
+         )
+       )}  # TOWKHT tab
       ),
       tabPanel("Hide plots",
         br(),
@@ -837,7 +927,15 @@ server <- function(input, output, session) {
     
     output$selected_cntry <- renderText(input$cntry)
     
-    output$selected_edu <- renderText(recode(input$edu, 1~"I", 2~"II", 3~"IIIa", 4~"IIIb", 5~"IV", 6~"V1", 7~"V2", 0 ~ "Other/missing"))
+    output$selected_edu <- renderText({recode(input$edu, 
+                                             1~"I (Less than lower secondary),", 
+                                             2~"II (Lower secondary),", 
+                                             3~"IIIa (Lower tier upper secondary),", 
+                                             4~"IIIb (Upper tier upper secondary),", 
+                                             5~"IV (Adv. vocational, Sub-degree),", 
+                                             6~"V1 (Lower tertiary, BA level),", 
+                                             7~"V2 (Higher tertiary, over MA level),", 
+                                             0 ~ "Other/missing,")})
     
     output$selected_n <- renderText({ 
       
@@ -875,6 +973,8 @@ server <- function(input, output, session) {
                                              "SK"~"Slovakia (SK),","SI"~"Slovenia (SI),","ES"~"Spain (EA),", "SE"~"Sweden (SE),",
                                              "CH"~"Switzerland (CH),", "UA"~"Ukraine (UA),","GB"~"United Kingdom (GB),")))
   } # Selected country text
+  
+  ### PLOTS ###
   
   {
     output$tygpnt_overview <- renderPlot({
@@ -2317,6 +2417,659 @@ server <- function(input, output, session) {
                                  '"In your opinion, what is the ideal age for a man to retire permanently?"'))
     }) # Function
   } # IAGRTR plots
+  
+  {
+    output$towkht_overview <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, towkht))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$towkht, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$towkht, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$towkht) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$towkht, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$towkht, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$towkht) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "towkht", limits = c(50,90),
+                     titles = c('"After what age would you say a woman is generally too old to be working 20 hours or more per week?"',
+                                '"After what age would you say a man is generally too old to be working 20 hours or more per week?"'))
+    }) # Function
+    
+    output$towkht_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "towkht", limits = c(50,90), 
+                      titles = c('"After what age would you say a woman is generally too old to be working 20 hours or more per week?"',
+                                 '"After what age would you say a man is generally too old to be working 20 hours or more per week?"'))
+    }) # Function
+    
+    output$towkht_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "tygrtr", limits = c(40,80), 
+                    titles = c('"In your opinion, what is the ideal age for a woman to retire permanently?"',
+                               '"In your opinion, what is the ideal age for a man to retire permanently?"'))
+    }) # Function
+    
+    output$towkht_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "towkht", limits = c(50,90),
+                      titles = c('"After what age would you say a ____ is generally too old to be working 20 hours or more per week?" (WOMENS\'s responses)',
+                                 '"After what age would you say a ____ is generally too old to be working 20 hours or more per week?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$towkht_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "towkht", limits =c(50,90),
+                      titles = c('"After what age would you say a woman is generally too old to be working 20 hours or more per week?"',
+                                 '"After what age would you say a man is generally too old to be working 20 hours or more per week?"'))
+    }) # Function
+  } # TOWKHT plots
+  
+  {
+    output$tyglvp_overview <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, tyglvp))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tyglvp, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tyglvp, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tyglvp) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tyglvp, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tyglvp, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tyglvp) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "tyglvp", limits = c(10,50),
+                     titles = c('"Before what age would you say a woman is generally too young to start living with a partner she is not married to?"',
+                                '"Before what age would you say a man is generally too young to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$tyglvp_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "tyglvp", limits = c(10,50), 
+                      titles = c('"Before what age would you say a woman is generally too young to start living with a partner she is not married to?"',
+                                 '"Before what age would you say a man is generally too young to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$tyglvp_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "tyglvp", limits = c(10,50), 
+                    titles = c('"Before what age would you say a woman is generally too young to start living with a partner she is not married to?"',
+                               '"Before what age would you say a man is generally too young to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$tyglvp_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "tyglvp", limits = c(10,50),
+                      titles = c('"Before what age would you say a ____ is generally too young to start living with a partner they are not married to?" (WOMENS\'s responses)',
+                                 '"Before what age would you say a ____ is generally too young to start living with a partner they are not married to?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$tyglvp_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "tyglvp", limits =c(10,50),
+                      titles = c('"Before what age would you say a woman is generally too young to start living with a partner she is not married to?"',
+                                 '"Before what age would you say a man is generally too young to start living with a partner he is not married to?"'))
+    }) # Function
+  } # TYGLVP plots
+  
+  {
+    output$iaglptn_overview <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, iaglptn))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$iaglptn, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$iaglptn, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$iaglptn) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$iaglptn, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$iaglptn, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$iaglptn) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "iaglptn", limits = c(10,50),
+                     titles = c('"In your opinion, what is the ideal age for a girl or woman to start living with a partner she is not married to?"',
+                                '"In your opinion, what is the ideal age for a boy or man to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$iaglptn_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "iaglptn", limits = c(10,50), 
+                      titles = c('"In your opinion, what is the ideal age for a girl or woman to start living with a partner she is not married to?"',
+                                 '"In your opinion, what is the ideal age for a boy or man to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$iaglptn_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "iaglptn", limits = c(10,50), 
+                    titles = c('"In your opinion, what is the ideal age for a girl or woman to start living with a partner she is not married to?"',
+                               '"In your opinion, what is the ideal age for a boy or man to start living with a partner he is not married to?"'))
+    }) # Function
+    
+    output$iaglptn_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "iaglptn", limits = c(10,50),
+                      titles = c('"In your opinion, what is the ideal age for a ____ or woman/man to start living with a partner they are not married to?" (WOMENS\'s responses)',
+                                 '"In your opinion, what is the ideal age for a ____ or woman/man to start living with a partner they are not married to?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$iaglptn_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "iaglptn", limits =c(10,50),
+                      titles = c('"In your opinion, what is the ideal age for a girl or woman to start living with a partner she is not married to?"',
+                                 '"In your opinion, what is the ideal age for a boy or man to start living with a partner he is not married to?"'))
+    }) # Function
+  } # IAGLPTN plots
+  
+  {
+    output$tolvpnt_overview <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data_full <- tol_full %>%
+        subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      data <- na.omit(data_full %>% select(cntry, ballot, tolvpnt))
+      
+      data_agg1 <- count(data %>% subset(ballot == 1), cntry)
+      data_agg1$mean <- 0
+      data_agg1$se <- 0
+      data_agg1$median <- 0
+      data_agg1$total_N <- 0
+      
+      data_agg2 <- count(data %>% subset(ballot == 2), cntry)
+      data_agg2$mean <- 0
+      data_agg2$se <- 0
+      data_agg2$median <- 0
+      data_agg2$total_N <- 0
+      
+      col_order <- c("cntry", "mean", "se", "median", "n")
+      data_agg1 <- data_agg1[, col_order]
+      data_agg2 <- data_agg2[, col_order]
+      
+      for (i in data_agg1$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
+        data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tolvpnt, design = design)[1] %>% round(digits = 2)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tolvpnt, design = design)) %>% round(digits = 5)
+        data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tolvpnt) %>% round(digits = 2)
+        data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
+      }
+      
+      for (i in data_agg2$cntry){
+        design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
+        data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tolvpnt, design = design)[1] %>% round(digits = 2)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tolvpnt, design = design)) %>% round(digits = 5)
+        data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tolvpnt) %>% round(digits = 2)
+        data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
+      }
+      
+      overview_plots(data = data, table_data1 = data_agg1, table_data2 = data_agg2, var = "tolvpnt", limits = c(10,50),
+                     titles = c('"After what age would you say a woman is generally too old to still be living with her parents?"',
+                                '"After what age would you say a man is generally too old to still be living with his parents?"'))
+    }) # Function
+    
+    output$tolvpnt_by_gender <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender != "No answer") %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2]) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_gender_plots(data = data, var = "tolvpnt", limits = c(10,50), 
+                      titles = c('"After what age would you say a woman is generally too old to still be living with her parents?"',
+                                 '"After what age would you say a man is generally too old to still be living with his parents?"'))
+    }) # Function
+    
+    output$tolvpnt_by_year <- renderPlot({
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>% subset(gender != "No answer") %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %notin% c("CZ","DK","ES","IT","PT","RS","RU","SE","SK","UA")) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_year_plots(data = data, var = "tolvpnt", limits = c(10,50), 
+                    titles = c('"After what age would you say a woman is generally too old to still be living with her parents?"',
+                               '"After what age would you say a man is generally too old to still be living with his parents?"'))
+    }) # Function
+    
+    output$tolvpnt_by_ballot <- renderPlot({
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(year %in% chosen_year) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(edu %in% chosen_edu) %>%
+        subset(agea >= input$age[1] & agea <= input$age[2])
+      
+      by_ballot_plots(data = data, var = "tolvpnt", limits = c(10,50),
+                      titles = c('"After what age would you say a ____ is generally too old to still be living with their parents?" (WOMENS\'s responses)',
+                                 '"After what age would you say a ____ is generally too old to still be living with their parents?" (MENS\'s responses)'))
+    }) # Function
+    
+    output$tolvpnt_by_cohort <- renderPlot({
+      
+      if(input$gender == "Female and Male"){
+        chosen_gender <- c("Female", "Male")
+      }else{chosen_gender <- c(input$gender)}
+      
+      if(input$year == "2006 and 2018"){
+        chosen_year <- c("2006","2018")
+      }else{chosen_year <- c(input$year)}
+      
+      chosen_cntry <- input$cntry
+      
+      chosen_edu <- input$edu
+      
+      data <- tol %>%
+        subset(gender %in% chosen_gender) %>%
+        subset(cntry %in% chosen_cntry) %>%
+        subset(year %in% chosen_year) %>%
+        subset(edu %in% chosen_edu)
+      
+      by_cohort_plots(data = data, var = "tolvpnt", limits =c(10,50),
+                      titles = c('"After what age would you say a woman is generally too old to still be living with her parents?"',
+                                 '"After what age would you say a man is generally too old to still be living with his parents?"'))
+    }) # Function
+  } # TOLVPNT plots
+  
   {
   output$map <- renderPlot({
     
@@ -2439,7 +3192,7 @@ server <- function(input, output, session) {
         updateCheckboxGroupInput(session=session, 
                                  inputId="edu",
                                  label = "Select Highest Education Level",
-                                 choices = list("ES-ISCED I , less than lower secondary" = 1,
+                                 choices = list("ES-ISCED I, less than lower secondary" = 1,
                                                 "ES-ISCED II, lower secondary" = 2,
                                                 "ES-ISCED IIIb, lower tier upper secondary" = 3,
                                                 "ES-ISCED IIIa, upper tier upper secondary" = 4,
@@ -2447,7 +3200,7 @@ server <- function(input, output, session) {
                                                 "ES-ISCED V1, lower tertiary, BA level" = 6,
                                                 "ES-ISCED V2, higher tertiary, >= MA level" = 7,
                                                 "Other/Missing data"=0),
-                                 selected = c("ES-ISCED I , less than lower secondary" = 1,
+                                 selected = c("ES-ISCED I, less than lower secondary" = 1,
                                               "ES-ISCED II, lower secondary" = 2,
                                               "ES-ISCED IIIb, lower tier upper secondary" = 3,
                                               "ES-ISCED IIIa, upper tier upper secondary" = 4,
