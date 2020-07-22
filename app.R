@@ -673,7 +673,17 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
            choices = list("Child-bearing ages"= list("Too young to become parent" = "tygpnt_",
                                                      "Ideal age to become parent" = "iagpnt_",
                                                      "Too old to have more children" = "tochld_"),
-                           "Stages of life" = list("ageadlt","agemage","ageoage")))
+                          "Stages of life"    = list("Age become adult" = "ageadlt_",
+                                                     "Age become middle aged" = "agemage_",
+                                                     "Age reach old age" = "ageoage_"),
+                          "Retirement ages"   = list("Age too young to retire" = "tygrtr_",
+                                                     "Ideal age to retire" = "iagrtr_",
+                                                     "Age too old to be working 20 hrs" = "towkht_"),
+                          "Living arrangement"= list("Age too young to live with partner" = "tyglvp_",
+                                                     "Ideal age to live with partner" = "iaglptn_",
+                                                     "Age too old to still be living with parents" = "tolvpnt_")
+          )
+        )
       ),
       column(3, align = "left",
         selectInput("map_ballot",
@@ -3097,43 +3107,64 @@ server <- function(input, output, session) {
       scale_fill_brewer(palette = "Dark"
                         , name = "year")+
       labs(fill = "Age") +
-      scale_fill_continuous(limits = if(map_var1 == "tygpnt_f") {c(18,20)}
-                                else if(map_var1 == "tygpnt_m") {c(20,23)}
-                                else if(map_var1 == "iagpnt_f") {c(22,28)}
-                                else if(map_var1 == "iagpnt_m") {c(25,30)}
-                                else if(map_var1 == "tochld_f") {c(40,45)}
-                                else if(map_var1 == "tochld_m") {c(45,50)}
-                                else {c(18,50)},
+      scale_fill_continuous(limits = c(min(world[[map_var1]]), max(world[[map_var1]]))
+                                #      if(map_var1 == "tygpnt_f") {c(18,20)}
+                                # else if(map_var1 == "tygpnt_m") {c(20,23)}
+                                # else if(map_var1 == "iagpnt_f") {c(22,28)}
+                                # else if(map_var1 == "iagpnt_m") {c(25,30)}
+                                # else if(map_var1 == "tochld_f") {c(40,45)}
+                                # else if(map_var1 == "tochld_m") {c(45,50)}
+                                # else {c(18,50)}
+                            ,
                              high = "#132B43", low = "#56B1F7")}
     
-    legend1 <- {ggplot(world %>% subset(year == 2006) %>% na.omit()) +
-      geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7", aes(y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]))+
-      coord_cartesian(xlim=if(map_var1 == "tygpnt_f") {c(17,21)}
-                      else if(map_var1 == "tygpnt_m") {c(18,24)}
-                      else if(map_var1 == "iagpnt_f") {c(21,29)}
-                      else if(map_var1 == "iagpnt_m") {c(24,31)}
-                      else if(map_var1 == "tochld_f") {c(39,46)}
-                      else if(map_var1 == "tochld_m") {c(44,51)}
-                      else {c(18,50)})+
-      geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 9)+
+    legend1 <- {ggplot(data = world %>% subset(year == 2006) %>% na.omit(), 
+                       aes(x = .data[[map_var1]], y = reorder(name, .data[[map_var1]]), fill=.data[[map_var1]])) +
+        geom_bar(stat = "identity")+
+        coord_cartesian(xlim = c(min(na.omit(world)[[map_var1]])-1, max(na.omit(world)[[map_var1]])+1)
+                        #      if(map_var1 == "tygpnt_f") {c(17,21)}
+                        # else if(map_var1 == "tygpnt_m") {c(18,24)}
+                        # else if(map_var1 == "iagpnt_f") {c(21,29)}
+                        # else if(map_var1 == "iagpnt_m") {c(24,31)}
+                        # else if(map_var1 == "tochld_f") {c(39,46)}
+                        # else if(map_var1 == "tochld_m") {c(44,51)}
+                        # else {c(18,50)}
+                        )+
+        scale_fill_gradient(low= "#56B1F7",high= "#132B43", space='Lab') +
+        geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 9)+
+        ggtitle("2006")+
+        theme(axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.ticks.x = element_blank(),
+              legend.position = "none")+
+        scale_y_discrete(breaks = NULL)+
+        theme(
+          panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
+          )}
+    
+    legend2 <- ggplot(data = world %>% subset(year == 2018) %>% na.omit(), 
+                      aes(x = .data[[map_var1]], y = reorder(name, .data[[map_var1]]), fill=.data[[map_var1]])) +
+      geom_bar(stat = "identity")+
+      coord_cartesian(xlim = c(min(na.omit(world)[[map_var1]])-1, max(na.omit(world)[[map_var1]])+1)
+                      #      if(map_var1 == "tygpnt_f") {c(17,21)}
+                      # else if(map_var1 == "tygpnt_m") {c(18,24)}
+                      # else if(map_var1 == "iagpnt_f") {c(21,29)}
+                      # else if(map_var1 == "iagpnt_m") {c(24,31)}
+                      # else if(map_var1 == "tochld_f") {c(39,46)}
+                      # else if(map_var1 == "tochld_m") {c(44,51)}
+                      # else {c(18,50)}
+                      )+
+      scale_fill_gradient(low= "#56B1F7",high= "#132B43", space='Lab') +
+      geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 10)+
       ggtitle("2006")+
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(),
-            axis.ticks.x = element_blank())}
-    
-    legend2 <- ggplot(world %>% subset(year == 2018) %>% na.omit()) +
-      geom_bar(stat = "identity", position = "dodge", fill = "#56B1F7", aes(y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]))+
-      coord_cartesian(xlim=if(map_var1 == "tygpnt_f") {c(17,21)}
-                      else if(map_var1 == "tygpnt_m") {c(18,24)}
-                      else if(map_var1 == "iagpnt_f") {c(21,29)}
-                      else if(map_var1 == "iagpnt_m") {c(24,31)}
-                      else if(map_var1 == "tochld_f") {c(39,46)}
-                      else if(map_var1 == "tochld_m") {c(44,51)}
-                      else {c(18,50)})+
-      geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 10)+
-      ggtitle("2018")+
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank())
+            axis.ticks.x = element_blank(),
+            legend.position = "none")+
+      scale_y_discrete(breaks = NULL)+
+      theme(
+        panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
+      )
     
     legend <- grid.arrange(legend1, legend2, nrow = 2)
     
