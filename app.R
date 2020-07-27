@@ -70,6 +70,7 @@
   
   world$code <- tolower(world$name)
   
+  world_full <- ne_countries(scale = "medium", returnclass = "sf") %>% select(name, continent)
   
   {code <- sort(c("AT","BE","BG","CH","CY","DE","DK","EA","EE","FI","FR","GB","HU",
                  "IE","NL","NO","PL","PT","RU","SE","SI","SK","UA","CZ","IT","RS"))
@@ -787,7 +788,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
     
     tbl2 <- tableGrob(t(table_data2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
     
-    grid.arrange(p1,tbl1,p2,tbl2,nrow = 4)
+    grid.arrange(ggplotGrob(p1),tbl1,ggplotGrob(p2),tbl2,nrow = 4)
   }
   
   by_gender_plots <- function(data, var, limits, titles){
@@ -1025,7 +1026,7 @@ server <- function(input, output, session) {
       for (i in data_agg1$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 1), weights = subset(data, cntry == i & ballot == 1)$dweight)
         data_agg1$mean[which(data_agg1$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)) %>% round(digits = 5)
+        data_agg1$se[which(data_agg1$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 1)$tygpnt, design = design)) %>% round(digits = 4)
         data_agg1$median[which(data_agg1$cntry == i)] <- median(subset(data, cntry == i & ballot == 1)$tygpnt) %>% round(digits = 2)
         data_agg1$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 1))
       }
@@ -1033,7 +1034,7 @@ server <- function(input, output, session) {
       for (i in data_agg2$cntry){
         design <- svydesign(ids = ~0, data = subset(data, cntry == i & ballot == 2), weights = subset(data, cntry == i & ballot == 2)$dweight)
         data_agg2$mean[which(data_agg2$cntry == i)] <- svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)[1] %>% round(digits = 2)
-        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)) %>% round(digits = 5)
+        data_agg2$se[which(data_agg2$cntry == i)] <- SE(svymean(subset(data, cntry == i & ballot == 2)$tygpnt, design = design)) %>% round(digits = 4)
         data_agg2$median[which(data_agg2$cntry == i)] <- median(subset(data, cntry == i & ballot == 2)$tygpnt) %>% round(digits = 2)
         data_agg2$total_N[which(data_agg1$cntry == i)] <- nrow(data_full %>% subset(cntry == i & ballot == 2))
       }
@@ -3082,9 +3083,10 @@ server <- function(input, output, session) {
     map_var2 <- paste(input$map_question, input$map_ballot, sep = "")
     
     map <- {ggplot(data = world) +
+      geom_sf(data = world_full, fill = "grey50")+
       geom_sf(aes(fill = world[[map_var1]])) +
       ggtitle(paste('',
-          recode(map_var1, 
+          recode(map_var1,
   "tygpnt_f"~'"Before what age would you say a woman is generally too young to become a mother?"',
   "tygpnt_m"~'"Before what age would you say a man is generally too young to become a father?"',
   "iagpnt_f"~'"In your opinion, what age is ideal for a woman to become a mother?"',
@@ -3100,7 +3102,7 @@ server <- function(input, output, session) {
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
             axis.title.x = element_blank(),
-            legend.position = c(0.04, 0.94),
+            legend.position = c(0.04, 0.74),
             panel.grid = element_blank(),)+
       facet_wrap(~year, nrow = 2)+
       scale_alpha_discrete(range = c(0.4,1)) +
@@ -3118,7 +3120,9 @@ server <- function(input, output, session) {
                             ,
                              high = "#132B43", low = "#56B1F7")}
     
-    legend1 <- {ggplot(data = world %>% subset(year == 2006) %>% na.omit(), 
+    legend1 <- {ggplot(data = world 
+                       #%>% subset(year == 2006) 
+                       %>% na.omit(), 
                        aes(x = .data[[map_var1]], y = reorder(name, .data[[map_var1]]), fill=.data[[map_var1]])) +
         geom_bar(stat = "identity")+
         coord_cartesian(xlim = c(min(na.omit(world)[[map_var1]])-1, max(na.omit(world)[[map_var1]])+1)
@@ -3131,44 +3135,47 @@ server <- function(input, output, session) {
                         # else {c(18,50)}
                         )+
         scale_fill_gradient(low= "#56B1F7",high= "#132B43", space='Lab') +
-        geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 9)+
-        ggtitle("2006")+
+        geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 6)+
+        ggtitle(" ")+
         theme(axis.title.x = element_blank(),
               axis.title.y = element_blank(),
-              axis.ticks.x = element_blank(),
+              #axis.ticks.x = element_blank(),
               legend.position = "none")+
         scale_y_discrete(breaks = NULL)+
+        scale_x_continuous(breaks = seq(1,50))+
         theme(
           panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
-          )}
+        )+
+        facet_wrap(~ year, ncol = 1, scales = "free")}
     
-    legend2 <- ggplot(data = world %>% subset(year == 2018) %>% na.omit(), 
-                      aes(x = .data[[map_var1]], y = reorder(name, .data[[map_var1]]), fill=.data[[map_var1]])) +
-      geom_bar(stat = "identity")+
-      coord_cartesian(xlim = c(min(na.omit(world)[[map_var1]])-1, max(na.omit(world)[[map_var1]])+1)
-                      #      if(map_var1 == "tygpnt_f") {c(17,21)}
-                      # else if(map_var1 == "tygpnt_m") {c(18,24)}
-                      # else if(map_var1 == "iagpnt_f") {c(21,29)}
-                      # else if(map_var1 == "iagpnt_m") {c(24,31)}
-                      # else if(map_var1 == "tochld_f") {c(39,46)}
-                      # else if(map_var1 == "tochld_m") {c(44,51)}
-                      # else {c(18,50)}
-                      )+
-      scale_fill_gradient(low= "#56B1F7",high= "#132B43", space='Lab') +
-      geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 10)+
-      ggtitle("2006")+
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            axis.ticks.x = element_blank(),
-            legend.position = "none")+
-      scale_y_discrete(breaks = NULL)+
-      theme(
-        panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
-      )
+    # legend2 <- ggplot(data = world %>% subset(year == 2018) %>% na.omit(), 
+    #                   aes(x = .data[[map_var1]], y = reorder(name, .data[[map_var1]]), fill=.data[[map_var1]])) +
+    #   geom_bar(stat = "identity")+
+    #   coord_cartesian(xlim = c(min(na.omit(world)[[map_var1]])-1, max(na.omit(world)[[map_var1]])+1)
+    #                   #      if(map_var1 == "tygpnt_f") {c(17,21)}
+    #                   # else if(map_var1 == "tygpnt_m") {c(18,24)}
+    #                   # else if(map_var1 == "iagpnt_f") {c(21,29)}
+    #                   # else if(map_var1 == "iagpnt_m") {c(24,31)}
+    #                   # else if(map_var1 == "tochld_f") {c(39,46)}
+    #                   # else if(map_var1 == "tochld_m") {c(44,51)}
+    #                   # else {c(18,50)}
+    #                   )+
+    #   scale_fill_gradient(low= "#56B1F7",high= "#132B43", space='Lab') +
+    #   geom_flag(aes(country = code, y = reorder(name, .data[[map_var1]]), x = .data[[map_var1]]), size = 6)+
+    #   ggtitle("2006")+
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(),
+    #         axis.ticks.x = element_blank(),
+    #         legend.position = "none")+
+    #   scale_y_discrete(breaks = NULL)+
+    #   scale_x_continuous(breaks = seq(1,50))+
+    #   theme(
+    #     panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
+    #   )
     
-    legend <- grid.arrange(legend1, legend2, nrow = 2)
+    # legend <- grid.arrange(legend1, legend2, nrow = 2)
     
-    ggarrange(map, legend, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
+    ggarrange(map, legend1, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
     
   })
   } # Map drawer
