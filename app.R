@@ -174,7 +174,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                                ),
                                selectInput("year",
                                            label = "Select data collection Year",
-                                           choices = c("2006 and 2018","2006","2018"),
+                                           choices = c("2006","2018"),
                                            selected = "2018")
                         ),
                         column(6,
@@ -789,7 +789,7 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
     tbl2 <- tableGrob(t(table_data2), rows=c("Country","Weighted Mean", "Mean SE", "Median", "Valid N", "Total N"), theme=tt)
     
     grid.arrange(ggplotGrob(p1),tbl1,ggplotGrob(p2),tbl2,nrow = 4)
-  }
+  } 
   
   by_gender_plots <- function(data, var, limits, titles){
     
