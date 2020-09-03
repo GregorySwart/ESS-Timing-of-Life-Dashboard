@@ -66,8 +66,7 @@ server <- function(input, output, session) {
                                              "CH"~"Switzerland (CH),", "UA"~"Ukraine (UA),","GB"~"United Kingdom (GB),")))
   } # Selected country text
   
-  ### PLOTS ###
-  
+  {
   {
     output$tygpnt_overview <- renderPlot({
       
@@ -2164,6 +2163,7 @@ server <- function(input, output, session) {
                                  '"After what age would you say a man is generally too old to still be living with his parents?"'))
     }) # Function
   } # TOLVPNT plots
+  } ### PLOTS ###
   
   {
     output$map <- renderPlot({
@@ -2181,7 +2181,26 @@ server <- function(input, output, session) {
                                "iagpnt_f"~'"In your opinion, what age is ideal for a woman to become a mother?"',
                                "iagpnt_m"~'"In your opinion, what age is ideal for a man to become a father?"',
                                "tochld_f"~'"After what age would you say a woman is generally too old to consider having any more children?"',
-                               "tochld_m"~'"After what age would you say a man is generally too old to consider having any more children?"'),
+                               "tochld_m"~'"After what age would you say a man is generally too old to consider having any more children?"',
+                               "ageadlt_f"~"At what age, approximately, would you say girls or women become adults?",
+                               "ageadlt_m"~"At what age, approximately, would you say boys or men become adults?",
+                               "agemage_f"~"At what age, approximately, would you say women reach middle age?",
+                               "agemage_m"~"At what age, approximately, would you say men reach middle age?",
+                               "ageoage_f"~"At what age, approximately, would you say women reach old age?",
+                               "ageoage_m"~"At what age, approximately, would you say men reach old age?",
+                               "tygrtr_f"~"Before what age would you say a woman is generally too young to retire permanently?",
+                               "tygrtr_m"~"Before what age would you say a man is generally too young to retire permanently?",
+                               "iagrtr_f"~"In your opinion, what is the ideal age for a woman to retire permanently?",
+                               "iagrtr_m"~"In your opinion, what is the ideal age for a man to retire permanently?",
+                               "towkht_f"~"After what age would you say a woman is generally too old to be working 20 hours or more per week?",
+                               "towkht_m"~"After what age would you say a man is generally too old to be working 20 hours or more per week?",
+                               "tyglvp_f"~"Before what age would you say a woman is generally too young to start living with a partner she is not married to?",
+                               "tyglvp_m"~"Before what age would you say a man is generally too young to start living with a partner he is not married to?",
+                               "iaglptn_f"~"In your opinion, what is the ideal age for a girl or woman to start living with a partner she is not married to?",
+                               "iaglptn_m"~"In your opinion, what is the ideal age for a boy or man to start living with a partner he is not married to?",
+                               "tolvpnt_f"~"After what age would you say a woman is generally too old to still be living with her parents?",
+                               "tolvpnt_m"~"After what age would you say a man is generally too old to still be living with his parents?"
+                               ),
                         '')) +
           scale_x_continuous(limits = c(-20,50)) +
           scale_y_continuous(limits = c(35,70)) +
@@ -2231,7 +2250,9 @@ server <- function(input, output, session) {
                 #axis.ticks.x = element_blank(),
                 legend.position = "none")+
           scale_y_discrete(breaks = NULL)+
-          scale_x_continuous(breaks = seq(1,50))+
+          scale_x_continuous(breaks = if(map_var1 %in% c("agemage_f","agemage_m","ageoage_f","ageoage_m","tygrtr_f","tygrtr_m",
+                                                         "iagrtr_f", "towkht_f","towkht_m","tolvpnt_f","tolvpnt_m")){seq(0,100, by = 2)}
+                                      else{seq(0,100)})+
           theme(
             panel.grid.major.x = element_line(size = 1, colour = "#0091FF")
           )+
@@ -2264,7 +2285,7 @@ server <- function(input, output, session) {
       
       # legend <- grid.arrange(legend1, legend2, nrow = 2)
       
-      ggarrange(map, legend1, ncol = 2, widths = c(6,1), heights = c(1,1), align = "v")
+      ggarrange(map, legend1, ncol = 2, widths = c(12,3), heights = c(1,1), align = "v") %>% annotate_figure(top= " ")
       
     })
   } # Map drawer

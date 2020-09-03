@@ -3,18 +3,19 @@ source("libraries.R")  # Read in Libraries
 source("functions.R")  # Define functions
 source("data_setup.R") # Do some data manipulation
 
-
-
-ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
+ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE, responsive = TRUE,
                   theme = shinythemes::shinytheme("sandstone"),
                   windowTitle = "ESS Timing of Life",
                   {tabPanel("Main page",
                             {fluidRow(
-                              column(2,
-                                     img(src = "logo.png", height = "10%", width = "100%")
+                              column(1, align = "center",
+                                     img(src = "logo.png", height = "220%", width = "220%", style="display: block; margin-left: auto; margin-right: auto;")
                               ),
-                              column(9,
+                              column(10,
                                      h1("Welcome to the ESS Timing of Life interactive dashboard!", align = "center")
+                              ),
+                              column(1, align = "center",
+                                     img(src = "szi_logo2.png", height = "150%", width = "150%", align = "right")
                               )
                             )}, # Title
                             {fluidRow(
@@ -206,11 +207,13 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                                         tabPanel("Hide plots",
                                                  br(),
                                                  br(),
-                                                 br(),
+                                                 h4("The boxplots are hidden at the moment. The demographics selector tool will work much faster this way!", align = "center"),
                                                  br(),
                                                  br()
                                         )
                             )}, # Question selector menu
+                  hr(),
+                  p("ESS App Version 1.0 developed and designed by Gregory Alexander Swart", align = "center")
                   )}, # Main Page
                   {tabPanel("Map drawer",
                             h2("In this page you can view median responses to the survey questions using a map drawer.", align = "center"),
@@ -246,7 +249,9 @@ ui <- {navbarPage("ESS Timing of Life", collapsible = TRUE,
                               column(8,
                                      plotOutput("map", height = 1200)
                               )
-                            )
+                            ),
+                            hr(),
+                            p("ESS App Version 1.0 developed and designed by Gregory Alexander Swart", align = "center")
                   )}, # Map drawer
                   {tabPanel("Data export",
                             h2("In this page you can download the data used in the app in .csv and .sav formats", align = "center"),
